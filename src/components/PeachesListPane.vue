@@ -1,9 +1,37 @@
 <template>
-    <v-container>
-        <v-row align="stretch">
-            <v-data-table :headers="headers" :items="submitted"></v-data-table>
-        </v-row>
-    </v-container>
+    <v-sheet>
+        <v-tabs>
+            <v-tab>
+                <v-icon left>mdi-account</v-icon>
+                Uus
+            </v-tab>
+            <v-tab>
+                <v-icon left>mdi-watch</v-icon>
+                Kinnituse ootel
+            </v-tab>
+            <v-tab-item>
+                <v-data-table :headers="headers" :items="submitted">
+                    <template slot="body" slot-scope="props">
+                        <tbody>
+                            <tr
+                                v-for="item in props.items"
+                                :key="item.id"
+                                @click="navigate(item)"
+                            >
+                                <td>{{ item.label }}</td>
+                                <td>{{ item.state }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>{{ item.content }}</td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </v-data-table>
+            </v-tab-item>
+            <v-tab-item>
+                teine tab
+            </v-tab-item>
+        </v-tabs>
+    </v-sheet>
 </template>
 
 <script>
@@ -11,15 +39,19 @@ export default {
     name: 'PeachesListPane',
     data: () => ({
         search: '',
+        navigate: (item) => {
+            console.log('We navigated to:');
+            console.log(JSON.stringify(item));
+        },
         headers: [
-            { text: 'Vorm', align: 'left', value: 'form' },
-            { text: 'Teema', align: 'left', value: 'label' },
-            { text: 'Staatus', align: 'left', value: 'state' },
-            { text: 'Email', align: 'left', value: 'email' },
+            { text: 'Teema', align: 'left', value: 'label', width: '1%' },
+            { text: 'Olek', align: 'left', value: 'state', width: '1%' },
+            { text: 'Email', align: 'left', value: 'email', width: '1%' },
             { text: 'Sisu', align: 'left', value: 'content' },
         ],
         submitted: [
             {
+                id: 1,
                 form: 1,
                 label: 'Canva',
                 state: 'uus',
@@ -31,6 +63,7 @@ export default {
                 }),
             },
             {
+                id: 2,
                 form: 1,
                 label: 'Sketchup',
                 state: 'uus',
@@ -42,6 +75,7 @@ export default {
                 }),
             },
             {
+                id: 3,
                 form: 2,
                 label: 'Sketchup',
                 state: 'uus_aeg',
