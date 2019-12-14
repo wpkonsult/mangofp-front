@@ -1,16 +1,12 @@
 <template>
     <v-sheet>
         <v-tabs>
-            <v-tab>
-                <v-icon left>mdi-account</v-icon>
-                Uus
+            <v-tab v-for="status in statuses" :key="status.order">
+                {{ status.state }}
             </v-tab>
-            <v-tab>
-                <v-icon left>mdi-watch</v-icon>
-                Kinnituse ootel
-            </v-tab>
-            <v-tab-item>
+            <v-tab-item v-for="status in statuses" :key="status.code">
                 <v-container>
+                    <h2>{{ status.state }}</h2>
                     <v-row align="stretch">
                         <v-col cols="6" md="8">
                             <PeachesListPane
@@ -27,9 +23,6 @@
                     </v-row>
                 </v-container>
             </v-tab-item>
-            <v-tab-item>
-                teine tab
-            </v-tab-item>
         </v-tabs>
     </v-sheet>
 </template>
@@ -44,14 +37,103 @@ export default {
         PeachesListPane,
         PeachesDetailPane,
     },
+    mounted() {
+        this.init();
+    },
     methods: {
-        rowSelected: function(item) {
+        init() {
+            this.statuses = Object.values(this.stateData);
+        },
+        rowSelected(item) {
             this.selectedItem = item.id;
         },
     },
     data: function() {
         return {
             selectedItem: '1',
+            statuses: [],
+            stateData: {
+                NEW: {
+                    order: 1,
+                    code: 'NEW',
+                    state: 'Uus',
+                    action: 'Määra uueks',
+                    next: [
+                        'REGISTERED',
+                        'WAIT4CONF',
+                        'WAIT4NEW',
+                        'WAIT4ACCEPT',
+                        'CANCELLED',
+                        'ARCHIVED',
+                    ],
+                },
+                REGISTERED: {
+                    order: 2,
+                    code: 'REGISTERED',
+                    state: 'Registreeritud',
+                    action: 'Registreeri',
+                    next: ['NOTIFIED', 'ARCHIVED', 'CANCELLED'],
+                },
+                WAIT4CONF: {
+                    order: 3,
+                    code: 'WAIT4CONF',
+                    state: 'Kinnitamisel',
+                    action: 'Saada kinnitamiseks',
+                    next: ['REGISTERED', 'CANCELLED'],
+                },
+                WAIT4NEW: {
+                    order: 4,
+                    code: 'WAIT4NEW',
+                    state: 'Vajab uut aega',
+                    action: 'Ootab uut aega',
+                    next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
+                },
+                WAIT4ACCEPT: {
+                    order: 5,
+                    code: 'WAIT4ACCEPT',
+                    state: 'Aeg pakutud',
+                    action: 'Ootab uut aega',
+                    next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
+                },
+                NOTIFIED: {
+                    order: 6,
+                    code: 'NOTIFIED',
+                    state: 'Teade saadetud',
+                    action: 'Saada meeldetuletus',
+                    next: ['FBASKED', 'ARCHIVED'],
+                },
+                FBASKED: {
+                    order: 7,
+                    code: 'FBASKED',
+                    state: 'Tagasiside küsitud',
+                    action: 'Küsi tagasiside',
+                    next: ['ARCHIVED'],
+                },
+                ARCHIVED: {
+                    order: 8,
+                    code: 'ARCHIVED',
+                    state: 'Arhiveeritud',
+                    action: 'Arhiveeri',
+                    next: [],
+                },
+                CANCELLED: {
+                    order: 9,
+                    code: 'CANCELLED',
+                    state: 'Katkestatud',
+                    action: 'Määra katkestatuks',
+                    next: ['ARCHIVED'],
+                },
+            },
+            labels: [
+                { id: '001', name: 'Praktiline arvuti baaskoolitus' },
+                { id: '002', name: 'MS Office komplekskoolitus' },
+                { id: '003', name: 'Exceli baaskursus' },
+                { id: '004', name: 'Funktsioonid ja valemid Excelis' },
+                { id: '005', name: 'Fotograafia ABC' },
+                { id: '006', name: "PhotoShop'i algkoolitus" },
+                { id: '007', name: 'Tootefoto pildistamine ja töötlus' },
+                { id: '008', name: 'Esmaabi' },
+            ],
             submitted: [
                 {
                     id: '1',
