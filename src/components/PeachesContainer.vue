@@ -1,30 +1,43 @@
 <template>
-    <v-sheet>
-        <v-tabs>
-            <v-tab v-for="status in statuses" :key="status.order">
-                {{ status.state }}
-            </v-tab>
-            <v-tab-item v-for="status in statuses" :key="status.code">
-                <v-container>
-                    <h2>{{ status.state }}</h2>
-                    <v-row align="stretch">
-                        <v-col cols="6" md="8">
-                            <PeachesListPane
-                                :submitted="submitted"
-                                @row-selected="rowSelected"
-                            />
-                        </v-col>
-                        <v-col cols="6" md="4">
-                            <PeachesDetailPane
-                                :selectedItem="selectedItem"
-                                :submitted="submitted"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-tab-item>
-        </v-tabs>
-    </v-sheet>
+    <v-app>
+        <v-sheet>
+            <v-select
+                :items="labelValues"
+                label="Filtreeri teemad"
+                single-line
+                bottom
+                v-model="labelFilter"
+                @change="labelFilterChanged"
+            >
+            </v-select>
+            <v-tabs @change="tabChanged">
+                <v-tab v-for="status in statuses" :key="status.order">
+                    {{ status.state }}
+                </v-tab>
+                <v-tab-item v-for="status in statuses" :key="status.code">
+                    <v-container>
+                        <h2>{{ status.state }}</h2>
+                        <v-row align="stretch">
+                            <v-col cols="6" md="8">
+                                <PeachesListPane
+                                    value="0"
+                                    :submitted="submitted"
+                                    @row-selected="rowSelected"
+                                />
+                            </v-col>
+                            <v-col cols="6" md="4">
+                                <PeachesDetailPane
+                                    :selectedItem="selectedItem"
+                                    :submitted="submitted"
+                                    :labels="labelValues"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-tab-item>
+            </v-tabs>
+        </v-sheet>
+    </v-app>
 </template>
 
 <script>
@@ -43,15 +56,26 @@ export default {
     methods: {
         init() {
             this.statuses = Object.values(this.stateData);
+            this.labelValues = this.labels.map(item => item.name);
         },
         rowSelected(item) {
             this.selectedItem = item.id;
         },
+        tabChanged(tab) {
+            console.log('Tab is now: ' + JSON.stringify(tab));
+            this.selectedTab = tab;
+        },
+        labelFilterChanged() {
+            console.log('Labelfilter: ' + JSON.stringify(this.labelFilter));
+        },
     },
-    data: function() {
+    data() {
         return {
             selectedItem: '1',
+            labelFilter: [],
+            selectedTab: '',
             statuses: [],
+            labelValues: [],
             stateData: {
                 NEW: {
                     order: 1,
@@ -174,3 +198,11 @@ export default {
     },
 };
 </script>
+<style>
+.v-menu__content {
+    margin-left: -175px;
+}
+.v-select.v-text-field input {
+    display: none;
+}
+</style>
