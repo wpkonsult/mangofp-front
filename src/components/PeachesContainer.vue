@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-sheet>
+        <v-sheet class="pa-md-4">
             <v-select
                 :items="labelValues"
                 label="Filtreeri teemad"
