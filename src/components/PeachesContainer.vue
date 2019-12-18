@@ -30,6 +30,8 @@
                                     :selectedItem="selectedItem"
                                     :submitted="submitted"
                                     :labels="labelValues"
+                                    :selectedTab="selectedTab"
+                                    :statuses="statuses"
                                 />
                             </v-col>
                         </v-row>
@@ -62,7 +64,7 @@ export default {
             this.selectedItem = item.id;
         },
         tabChanged(tab) {
-            console.log('Tab is now: ' + JSON.stringify(tab));
+            console.log('Tab is now: ' + JSON.stringify(this.statuses[tab]));
             this.selectedTab = tab;
         },
         labelFilterChanged() {
@@ -116,7 +118,7 @@ export default {
                     order: 5,
                     code: 'WAIT4ACCEPT',
                     state: 'Aeg pakutud',
-                    action: 'Ootab uut aega',
+                    action: 'Paku uus aeg',
                     next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
                 },
                 NOTIFIED: {
@@ -144,7 +146,7 @@ export default {
                     order: 9,
                     code: 'CANCELLED',
                     state: 'Katkestatud',
-                    action: 'Määra katkestatuks',
+                    action: 'Katkesta',
                     next: ['ARCHIVED'],
                 },
             },
