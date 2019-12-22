@@ -16,6 +16,7 @@
                                 v-bind:content="item.content"
                             />
                         </td>
+                        <td></td>
                     </tr>
                 </tbody>
             </template>
@@ -52,7 +53,8 @@ export default {
             { text: 'Teema', align: 'left', value: 'label', width: '1%' },
             { text: 'Olek', align: 'left', value: 'state', width: '1%' },
             { text: 'Email', align: 'left', value: 'email', width: '1%' },
-            { text: 'Sisu', align: 'left', value: 'content' },
+            { text: 'Sisu', align: 'left', value: 'content', width: '80%' },
+            { text: '', align: 'left', value: '' },
         ],
     }),
 };

@@ -3,7 +3,7 @@
         <v-sheet class="pa-md-4">
             <v-select
                 :items="labelValues"
-                label="Filtreeri teemad"
+                label="Filtreeri teema"
                 single-line
                 bottom
                 v-model="labelFilter"
@@ -15,27 +15,26 @@
                     {{ status.state }}
                 </v-tab>
                 <v-tab-item v-for="status in statuses" :key="status.code">
-                    <v-container>
-                        <h2>{{ status.state }}</h2>
-                        <v-row align="stretch">
-                            <v-col cols="6" md="8">
-                                <PeachesListPane
-                                    value="0"
-                                    :submitted="submitted"
-                                    @row-selected="rowSelected"
-                                />
-                            </v-col>
-                            <v-col cols="6" md="4">
-                                <PeachesDetailPane
-                                    :selectedItem="selectedItem"
-                                    :submitted="submitted"
-                                    :labels="labelValues"
-                                    :selectedTab="selectedTab"
-                                    :statuses="statuses"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                    <h2>{{ status.state }}</h2>
+                    <v-row align="stretch">
+                        <v-col cols="6" md="8">
+                            <PeachesListPane
+                                value="0"
+                                :submitted="submitted"
+                                @row-selected="rowSelected"
+                            />
+                        </v-col>
+                        <v-col cols="6" md="4">
+                            <PeachesDetailPane
+                                :selectedItem="selectedItem"
+                                :submitted="submitted"
+                                :labels="labelValues"
+                                :selectedTab="selectedTab"
+                                :statuses="statuses"
+                                :emailTemplates="emailTemplates"
+                            />
+                        </v-col>
+                    </v-row>
                 </v-tab-item>
             </v-tabs>
         </v-sheet>
@@ -196,6 +195,18 @@ export default {
                     }),
                 },
             ],
+            emailTemplates: {
+                REGISTERED: {
+                    addresses: ['[email]', 'mingiarhiiv@nort.ee'],
+                    template:
+                        'Väga austatud [name],\n<br /><p>Olete regristreerunud kursusele "[label]"</p>Lugupidamisega<br />Õppekeskus N.O.R.T',
+                },
+                WAIT4CONF: {
+                    addresses: ['[email]', 'mingiarhiiv@nort.ee'],
+                    template:
+                        'Väga austatud Töötukassa,<br /><p>[name] soovib osaleda kursusel "[label], mis algab ??.??.??. Olete päri?"</p>Lugupidamisega<br />Õppekeskus N.O.R.T',
+                },
+            },
         };
     },
 };

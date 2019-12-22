@@ -6,22 +6,28 @@
             <v-select
                 :class="{ 'margin-left': '-180px' }"
                 :items="labels"
-                label="Teemad"
+                label="Määra teema"
                 @change="labelChanged"
             >
             </v-select>
-            <v-sheet v-for="action in actions" :key="action">
-                <v-btn class="ma-2" tile outlined color="success">
-                    <v-icon left>mdi-pencil</v-icon> {{ action }}
-                </v-btn>
+            <v-sheet v-for="action in actions" :key="action.code">
+                <PeachesEmailDialog
+                    :label="action.label"
+                    :state="action.code"
+                    :content="emailTemplates[action.code]"
+                />
             </v-sheet>
         </v-sheet>
     </v-flex>
 </template>
 
 <script>
+import PeachesEmailDialog from './PeachesEmailDialog';
 export default {
     name: 'PeachesDetailPane',
+    components: {
+        PeachesEmailDialog,
+    },
     methods: {
         labelChanged(value) {
             console.log('Label value is now: ' + JSON.stringify(value));
@@ -42,9 +48,10 @@ export default {
                 names[element.code] = element.action;
             });
 
-            return this.statuses[this.selectedTab].next.map(
-                code => names[code],
-            );
+            return this.statuses[this.selectedTab].next.map(code => ({
+                code,
+                label: names[code],
+            }));
         },
     },
     props: {
@@ -67,6 +74,10 @@ export default {
         statuses: {
             type: Array,
             required: true,
+        },
+        emailTemplates: {
+            type: Object,
+            required: false,
         },
     },
 };
