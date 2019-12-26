@@ -3,26 +3,38 @@
         <v-dialog v-model="dialog" scrollable max-width="600px">
             <template v-slot:activator="{ on }">
                 <v-btn class="ma-2" tile v-on="on" outlined color="success">
-                    <v-icon left>mdi-pencil</v-icon> {{ label }}
+                    <v-icon left>mdi-pencil</v-icon> {{ actionName }}
                 </v-btn>
             </template>
             <v-card v-if="content">
                 <v-card-title
-                    >Send message and set to "{{ label }}"
+                    >Send message and set to "{{ actionName }}"
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text style="height: 500px;">
-                    <p><b>Email to:</b>{{ content.addresses.join(', ') }}</p>
-                    <div v-html="content.template"></div>
+                    <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
+                    <v-divider></v-divider>
+                    <v-textarea
+                        filled
+                        name="email-text"
+                        label="Email content"
+                        no-resize
+                        rows="20"
+                        v-model="emailContent"
+                    ></v-textarea>
+                    <v-divider></v-divider>
                 </v-card-text>
-                <v-divider></v-divider>
                 <v-card-actions>
-                    <v-btn color="blue darken-1" text @click.native="confirm">
-                        {{ label }}
+                    <v-btn
+                        color="blue darken-1"
+                        outlined
+                        @click.native="confirm"
+                    >
+                        Confirm
                     </v-btn>
                     <v-btn
                         color="blue darken-1"
-                        text
+                        outlined
                         @click.native="confirmAndSend"
                     >
                         Confirm and send
@@ -30,10 +42,17 @@
                 </v-card-actions>
             </v-card>
             <v-card v-else>
-                <v-card-title> Set to state {{ label }} </v-card-title>
+                <v-card-title> Set to "{{ actionName }}"</v-card-title>
+                <v-card-text style="height: 500px;">
+                    <p>
+                        Please confirm, that message will be set to state "{{
+                            actionName
+                        }}"
+                    </p>
+                </v-card-text>
                 <v-divider></v-divider>
-                <v-btn color="blue darken-1" text @click.native="confirm">
-                    {{ label }}
+                <v-btn outlined color="success" @click.native="confirm">
+                    Confirm
                 </v-btn>
             </v-card>
         </v-dialog>
@@ -42,13 +61,25 @@
 <script>
 export default {
     props: {
-        label: {
+        actionName: {
             type: String,
             required: true,
         },
-        state: {
+        actionCode: {
             type: String,
             required: true,
+        },
+        name: {
+            type: String,
+            required: false,
+        },
+        email: {
+            type: String,
+            required: false,
+        },
+        label: {
+            type: String,
+            required: false,
         },
         content: {
             type: Object,
@@ -56,8 +87,33 @@ export default {
         },
     },
     methods: {
+        init() {
+            if (!this.$props.content || !this.$props.content.template) {
+                this.emailContent = '';
+                return '';
+            }
+
+            const shortcodes = ['name', 'label', 'email'];
+            var content = this.$props.content.template;
+
+            shortcodes.forEach(element => {
+                content = content.replace(
+                    new RegExp('<<' + element + '>>', 'g'),
+                    this.$props[element],
+                );
+            });
+
+            this.addresses = [
+                this.$props.email,
+                ...this.$props.content.addresses,
+            ];
+
+            this.emailContent = content;
+            return content;
+        },
         confirmAndSend() {
-            console.log('About to confirm and send');
+            console.log('About to confirm and send email');
+            console.log(this.emailContent);
             this.dialog = false;
             //this.$emit('update:dialog', false);
         },
@@ -70,7 +126,16 @@ export default {
     data() {
         return {
             dialog: false,
+            emailContent: '',
+            addresses: [],
         };
+    },
+    watch: {
+        dialog(newValue) {
+            if (newValue) {
+                this.init();
+            }
+        },
     },
 };
 </script>

@@ -12,9 +12,12 @@
             </v-select>
             <v-sheet v-for="action in actions" :key="action.code">
                 <PeachesEmailDialog
-                    :label="action.label"
-                    :state="action.code"
+                    :actionName="action.name"
+                    :actionCode="action.code"
                     :content="emailTemplates[action.code]"
+                    :name="details.name"
+                    :email="details.email"
+                    :label="details.label"
                 />
             </v-sheet>
         </v-sheet>
@@ -34,7 +37,7 @@ export default {
         },
     },
     computed: {
-        actions: function() {
+        actions() {
             if (
                 this.selectedTab &&
                 this.statuses[this.selectedTab] &&
@@ -50,8 +53,20 @@ export default {
 
             return this.statuses[this.selectedTab].next.map(code => ({
                 code,
-                label: names[code],
+                name: names[code],
             }));
+        },
+        details() {
+            const data = this.submitted.find(s => s.id === this.selectedItem);
+            if (data) {
+                return {
+                    name: data.name,
+                    email: data.email,
+                    label: data.label,
+                };
+            }
+
+            return { email: '', name: '', label: '' };
         },
     },
     props: {

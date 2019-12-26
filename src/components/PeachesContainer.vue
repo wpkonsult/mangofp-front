@@ -166,6 +166,7 @@ export default {
                     label: 'Canva',
                     state: 'uus',
                     email: 'kati.kaalikas@test.com',
+                    name: 'Kati',
                     content: Object.entries({
                         name: 'Kati Kaalikas',
                         message: 'Tahan teha ilusaid asju',
@@ -177,6 +178,7 @@ export default {
                     label: 'Sketchup',
                     state: 'uus',
                     email: 'mati.kaalikas@test.com',
+                    name: 'Mati',
                     content: Object.entries({
                         name: 'Mati Kaalikas',
                         message: 'Mul on vaja aiakuur joonestada',
@@ -188,6 +190,7 @@ export default {
                     label: 'Sketchup',
                     state: 'uus_aeg',
                     email: 'uudo.uugamets@test.com',
+                    name: 'Uudo',
                     content: Object.entries({
                         name: 'Uudo Uugamets',
                         message:
@@ -197,14 +200,14 @@ export default {
             ],
             emailTemplates: {
                 REGISTERED: {
-                    addresses: ['[email]', 'mingiarhiiv@nort.ee'],
+                    addresses: ['mingiarhiiv@nort.ee'],
                     template:
-                        'Väga austatud [name],\n<br /><p>Olete regristreerunud kursusele "[label]"</p>Lugupidamisega<br />Õppekeskus N.O.R.T',
+                        'Väga austatud <<name>> (<<email>>),\n\nOlete regristreerunud kursusele "<<label>>".\n\nLugupidamisega\nÕppekeskus N.O.R.T',
                 },
                 WAIT4CONF: {
-                    addresses: ['[email]', 'mingiarhiiv@nort.ee'],
+                    addresses: ['mingiarhiiv@nort.ee'],
                     template:
-                        'Väga austatud Töötukassa,<br /><p>[name] soovib osaleda kursusel "[label], mis algab ??.??.??. Olete päri?"</p>Lugupidamisega<br />Õppekeskus N.O.R.T',
+                        'Väga austatud Töötukassa,\n\n<<name>> soovib osaleda kursusel "<<label>>, mis algab ??.??.??. Olete päri?"\n\nLugupidamisega,\nÕppekeskus N.O.R.T\n\nP.S. <<name>> emaili aadress on <<email>>',
                 },
             },
         };
