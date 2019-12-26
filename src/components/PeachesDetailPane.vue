@@ -6,7 +6,7 @@
             <v-select
                 :class="{ 'margin-left': '-180px' }"
                 :items="labels"
-                label="Määra teema"
+                label="Muuda teemat"
                 @change="labelChanged"
             >
             </v-select>

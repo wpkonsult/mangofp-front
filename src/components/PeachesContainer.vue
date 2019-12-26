@@ -21,6 +21,7 @@
                             <PeachesListPane
                                 value="0"
                                 :submitted="submitted"
+                                :selectedItem="selectedItem"
                                 @row-selected="rowSelected"
                             />
                         </v-col>
@@ -207,7 +208,7 @@ export default {
                 WAIT4CONF: {
                     addresses: ['mingiarhiiv@nort.ee'],
                     template:
-                        'Väga austatud Töötukassa,\n\n<<name>> soovib osaleda kursusel "<<label>>, mis algab ??.??.??. Olete päri?"\n\nLugupidamisega,\nÕppekeskus N.O.R.T\n\nP.S. <<name>> emaili aadress on <<email>>',
+                        'Väga austatud Töötukassa,\n\n<<name>> soovib osaleda kursusel "<<label>>", mis algab ??.??.??. Olete päri?\n\nLugupidamisega,\nÕppekeskus N.O.R.T\n\nP.S. <<name>> emaili aadress on <<email>>',
                 },
             },
         };

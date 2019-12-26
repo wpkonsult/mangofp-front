@@ -7,6 +7,7 @@
                         v-for="item in props.items"
                         :key="item.id"
                         @click="selectItem(item)"
+                        :class="{ selectedLine: selectedItem === item.id }"
                     >
                         <td>{{ item.label }}</td>
                         <td>{{ item.state }}</td>
@@ -59,3 +60,9 @@ export default {
     }),
 };
 </script>
+<style>
+.selectedLine {
+    background-color: #1976d2;
+    color: #ffffff;
+}
+</style>
