@@ -6,7 +6,7 @@
             <v-select
                 :class="{ 'margin-left': '-180px' }"
                 :items="labels"
-                label="Muuda teemat"
+                :value="details.labelId"
                 @change="labelChanged"
             >
             </v-select>
@@ -63,10 +63,17 @@ export default {
                     name: data.name,
                     email: data.email,
                     label: data.label,
+                    labelId: data.labelId,
                 };
             }
 
-            return { email: '', name: '', label: '' };
+            return { email: '', name: '', label: '', labelId: '' };
+        },
+        labels() {
+            return this.labelsData.map(item => ({
+                value: item.id,
+                text: item.name,
+            }));
         },
     },
     props: {
@@ -74,7 +81,7 @@ export default {
             type: String,
             required: false,
         },
-        labels: {
+        labelsData: {
             type: Array,
             required: true,
         },

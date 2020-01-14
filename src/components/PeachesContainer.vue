@@ -2,7 +2,7 @@
     <v-app>
         <v-sheet class="pa-md-4">
             <v-select
-                :items="labelValues"
+                :items="labels"
                 label="Filtreeri teema"
                 single-line
                 bottom
@@ -22,6 +22,7 @@
                                 value="0"
                                 :submitted="submitted"
                                 :selectedItem="selectedItem"
+                                :labelsData="labelsData"
                                 @row-selected="rowSelected"
                             />
                         </v-col>
@@ -29,7 +30,7 @@
                             <PeachesDetailPane
                                 :selectedItem="selectedItem"
                                 :submitted="submitted"
-                                :labels="labelValues"
+                                :labelsData="labelsData"
                                 :selectedTab="selectedTab"
                                 :statuses="statuses"
                                 :emailTemplates="emailTemplates"
@@ -58,7 +59,6 @@ export default {
     methods: {
         init() {
             this.statuses = Object.values(this.stateData);
-            this.labelValues = this.labels.map(item => item.name);
         },
         rowSelected(item) {
             this.selectedItem = item.id;
@@ -71,13 +71,32 @@ export default {
             console.log('Labelfilter: ' + JSON.stringify(this.labelFilter));
         },
     },
+    computed: {
+        submitted() {
+            const labelsObj = {};
+            this.labelsData.forEach(elem => {
+                labelsObj[elem.id] = elem.name;
+            });
+
+            return this.submittedData.map(elem => ({
+                id: elem.id,
+                form: elem.form,
+                labelId: elem.labelId,
+                label: labelsObj[elem.labelId] || '',
+                state: elem.state,
+                email: elem.email,
+                name: elem.name,
+                content: elem.content,
+            }));
+        },
+    },
     data() {
         return {
             selectedItem: '1',
             labelFilter: [],
             selectedTab: '',
             statuses: [],
-            labelValues: [],
+            labels: [],
             stateData: {
                 NEW: {
                     order: 1,
@@ -150,7 +169,7 @@ export default {
                     next: ['ARCHIVED'],
                 },
             },
-            labels: [
+            labelsData: [
                 { id: '001', name: 'Praktiline arvuti baaskoolitus' },
                 { id: '002', name: 'MS Office komplekskoolitus' },
                 { id: '003', name: 'Exceli baaskursus' },
@@ -159,12 +178,14 @@ export default {
                 { id: '006', name: "PhotoShop'i algkoolitus" },
                 { id: '007', name: 'Tootefoto pildistamine ja töötlus' },
                 { id: '008', name: 'Esmaabi' },
+                { id: '009', name: 'Canva' },
+                { id: '010', name: 'Sketchup' },
             ],
-            submitted: [
+            submittedData: [
                 {
                     id: '1',
                     form: 1,
-                    label: 'Canva',
+                    labelId: '009',
                     state: 'uus',
                     email: 'kati.kaalikas@test.com',
                     name: 'Kati',
@@ -176,7 +197,7 @@ export default {
                 {
                     id: '2',
                     form: 1,
-                    label: 'Sketchup',
+                    labelId: '',
                     state: 'uus',
                     email: 'mati.kaalikas@test.com',
                     name: 'Mati',
@@ -188,7 +209,7 @@ export default {
                 {
                     id: '3',
                     form: 2,
-                    label: 'Sketchup',
+                    labelId: '010',
                     state: 'uus_aeg',
                     email: 'uudo.uugamets@test.com',
                     name: 'Uudo',
