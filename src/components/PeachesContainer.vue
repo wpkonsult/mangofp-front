@@ -1,14 +1,7 @@
 <template>
     <v-app>
         <v-sheet class="pa-md-4">
-            <v-select
-                :items="labels"
-                label="Filtreeri teema"
-                single-line
-                bottom
-                v-model="labelFilter"
-                @change="labelFilterChanged"
-            >
+            <v-select :items="labels" single-line bottom v-model="labelFilter">
             </v-select>
             <v-tabs @change="tabChanged">
                 <v-tab v-for="status in statuses" :key="status.order">
@@ -20,7 +13,7 @@
                         <v-col cols="6" md="8">
                             <PeachesListPane
                                 value="0"
-                                :submitted="submitted"
+                                :submitted="filtered"
                                 :selectedItem="selectedItem"
                                 :labelsData="labelsData"
                                 @row-selected="rowSelected"
@@ -64,11 +57,7 @@ export default {
             this.selectedItem = item.id;
         },
         tabChanged(tab) {
-            console.log('Tab is now: ' + JSON.stringify(this.statuses[tab]));
             this.selectedTab = tab;
-        },
-        labelFilterChanged() {
-            console.log('Labelfilter: ' + JSON.stringify(this.labelFilter));
         },
     },
     computed: {
@@ -84,19 +73,38 @@ export default {
                 labelId: elem.labelId,
                 label: labelsObj[elem.labelId] || '',
                 state: elem.state,
+                code: elem.code,
                 email: elem.email,
                 name: elem.name,
                 content: elem.content,
             }));
         },
+        filtered() {
+            return this.submitted.filter(
+                elem =>
+                    (!this.labelFilter ||
+                        this.labelFilter === '000' ||
+                        elem.labelId === this.labelFilter) &&
+                    elem.code === this.statuses[this.selectedTab].code,
+            );
+        },
+        labels() {
+            const labels = this.labelsData.map(item => ({
+                value: item.id,
+                text: item.name,
+            }));
+
+            labels.unshift({ value: '000', text: '--- Kõik ---' });
+
+            return labels;
+        },
     },
     data() {
         return {
             selectedItem: '1',
-            labelFilter: [],
-            selectedTab: '',
+            labelFilter: '000',
+            selectedTab: 1,
             statuses: [],
-            labels: [],
             stateData: {
                 NEW: {
                     order: 1,
@@ -186,7 +194,8 @@ export default {
                     id: '1',
                     form: 1,
                     labelId: '009',
-                    state: 'uus',
+                    code: 'NEW',
+                    state: 'Uus',
                     email: 'kati.kaalikas@test.com',
                     name: 'Kati',
                     content: Object.entries({
@@ -197,8 +206,9 @@ export default {
                 {
                     id: '2',
                     form: 1,
-                    labelId: '',
-                    state: 'uus',
+                    labelId: '009',
+                    code: 'NEW',
+                    state: 'Uus',
                     email: 'mati.kaalikas@test.com',
                     name: 'Mati',
                     content: Object.entries({
@@ -210,7 +220,8 @@ export default {
                     id: '3',
                     form: 2,
                     labelId: '010',
-                    state: 'uus_aeg',
+                    code: 'WAIT4ACCEPT',
+                    state: 'Aeg pakutud',
                     email: 'uudo.uugamets@test.com',
                     name: 'Uudo',
                     content: Object.entries({
