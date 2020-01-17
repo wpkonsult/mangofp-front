@@ -1,7 +1,12 @@
 <template>
     <v-app>
         <v-sheet class="pa-md-4">
-            <v-select :items="labels" single-line bottom v-model="labelFilter">
+            <v-select
+                :items="labels"
+                v-model="labelFilter"
+                label="Filter"
+                outlined
+            >
             </v-select>
             <v-tabs @change="tabChanged">
                 <v-tab v-for="status in statuses" :key="status.order">

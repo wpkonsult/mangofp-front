@@ -1,15 +1,20 @@
 <template>
     <v-flex xs12 sm12>
         <v-sheet>
-            Siin on detailid. Valitud teade:
-            {{ selectedItem || 'pole valitud' }}
+            Muuda andmeid:
             <v-select
                 :class="{ 'margin-left': '-180px' }"
                 :items="labels"
                 :value="details.labelId"
+                label="Teema"
                 @change="labelChanged"
             >
             </v-select>
+            <v-text-field
+                class="emailInput"
+                v-model="details.email"
+                label="Email"
+            ></v-text-field>
             <v-sheet v-for="action in actions" :key="action.code">
                 <PeachesEmailDialog
                     :actionName="action.name"
@@ -34,6 +39,7 @@ export default {
     methods: {
         labelChanged(value) {
             console.log('Label value is now: ' + JSON.stringify(value));
+            //TODO: trigger submission of change here
         },
     },
     computed: {
@@ -104,3 +110,9 @@ export default {
     },
 };
 </script>
+<style>
+.emailInput input {
+    margin-top: 5px;
+    border-style: hidden;
+}
+</style>
