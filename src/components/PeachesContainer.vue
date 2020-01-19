@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-sheet class="pa-md-4">
+        <v-sheet v-if="loaded" class="pa-md-4">
             <v-select
                 :items="labels"
                 v-model="labelFilter"
@@ -38,12 +38,16 @@
                 </v-tab-item>
             </v-tabs>
         </v-sheet>
+        <v-sheet v-else class="pa-md-4">
+            <p>Loading ...</p>
+        </v-sheet>
     </v-app>
 </template>
 
 <script>
 import PeachesListPane from './PeachesListPane';
 import PeachesDetailPane from './PeachesDetailPane';
+import { fetchLabels } from './../controllers/fetch';
 
 export default {
     name: 'PeachesContainer',
@@ -51,13 +55,18 @@ export default {
         PeachesListPane,
         PeachesDetailPane,
     },
-    mounted() {
-        this.init();
+    async mounted() {
+        this.statuses = Object.values(this.stateData);
+        try {
+            this.labelsData = await fetchLabels();
+            this.loaded = true;
+        } catch (e) {
+            console.log('Error: ' + e.message);
+            //this.loaded = true;
+            this.error = e.message;
+        }
     },
     methods: {
-        init() {
-            this.statuses = Object.values(this.stateData);
-        },
         rowSelected(item) {
             this.selectedItem = item.id;
         },
@@ -107,6 +116,7 @@ export default {
     data() {
         return {
             selectedItem: '1',
+            loaded: false,
             labelFilter: '000',
             selectedTab: 1,
             statuses: [],
@@ -182,18 +192,7 @@ export default {
                     next: ['ARCHIVED'],
                 },
             },
-            labelsData: [
-                { id: '001', name: 'Praktiline arvuti baaskoolitus' },
-                { id: '002', name: 'MS Office komplekskoolitus' },
-                { id: '003', name: 'Exceli baaskursus' },
-                { id: '004', name: 'Funktsioonid ja valemid Excelis' },
-                { id: '005', name: 'Fotograafia ABC' },
-                { id: '006', name: "PhotoShop'i algkoolitus" },
-                { id: '007', name: 'Tootefoto pildistamine ja töötlus' },
-                { id: '008', name: 'Esmaabi' },
-                { id: '009', name: 'Canva' },
-                { id: '010', name: 'Sketchup' },
-            ],
+            labelsData: [],
             submittedData: [
                 {
                     id: '1',
