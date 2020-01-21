@@ -47,7 +47,7 @@
 <script>
 import PeachesListPane from './PeachesListPane';
 import PeachesDetailPane from './PeachesDetailPane';
-import { fetchLabels } from './../controllers/fetch';
+import { fetchLabels, fetchMessages } from './../controllers/fetch';
 
 export default {
     name: 'PeachesContainer',
@@ -58,11 +58,13 @@ export default {
     async mounted() {
         this.statuses = Object.values(this.stateData);
         try {
-            this.labelsData = await fetchLabels();
+            [this.labelsData, this.submittedData] = await Promise.all([
+                fetchLabels(),
+                fetchMessages(),
+            ]);
             this.loaded = true;
         } catch (e) {
             console.log('Error: ' + e.message);
-            //this.loaded = true;
             this.error = e.message;
         }
     },
@@ -193,48 +195,7 @@ export default {
                 },
             },
             labelsData: [],
-            submittedData: [
-                {
-                    id: '1',
-                    form: 1,
-                    labelId: '009',
-                    code: 'NEW',
-                    state: 'Uus',
-                    email: 'kati.kaalikas@test.com',
-                    name: 'Kati',
-                    content: Object.entries({
-                        name: 'Kati Kaalikas',
-                        message: 'Tahan teha ilusaid asju',
-                    }),
-                },
-                {
-                    id: '2',
-                    form: 1,
-                    labelId: '009',
-                    code: 'NEW',
-                    state: 'Uus',
-                    email: 'mati.kaalikas@test.com',
-                    name: 'Mati',
-                    content: Object.entries({
-                        name: 'Mati Kaalikas',
-                        message: 'Mul on vaja aiakuur joonestada',
-                    }),
-                },
-                {
-                    id: '3',
-                    form: 2,
-                    labelId: '010',
-                    code: 'WAIT4ACCEPT',
-                    state: 'Aeg pakutud',
-                    email: 'uudo.uugamets@test.com',
-                    name: 'Uudo',
-                    content: Object.entries({
-                        name: 'Uudo Uugamets',
-                        message:
-                            'Tahan tulla Sketchupi kursusele, aga aeg ei sobi',
-                    }),
-                },
-            ],
+            submittedData: [],
             emailTemplates: {
                 REGISTERED: {
                     addresses: ['mingiarhiiv@nort.ee'],
