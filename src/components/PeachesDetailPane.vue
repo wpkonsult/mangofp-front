@@ -5,15 +5,15 @@
             <v-select
                 :class="{ 'margin-left': '-180px' }"
                 :items="labels"
-                :value="details.labelId"
+                v-model="selectedLabel"
                 label="Teema"
-                @change="labelChanged"
             >
             </v-select>
             <v-text-field
                 class="emailInput"
                 v-model="details.email"
                 label="Email"
+                @change="emailChanged"
             ></v-text-field>
             <v-sheet v-for="action in actions" :key="action.code">
                 <PeachesEmailDialog
@@ -31,6 +31,8 @@
 
 <script>
 import PeachesEmailDialog from './PeachesEmailDialog';
+import { bus } from '../main';
+
 export default {
     name: 'PeachesDetailPane',
     components: {
@@ -38,8 +40,14 @@ export default {
     },
     methods: {
         labelChanged(value) {
-            console.log('Label value is now: ' + JSON.stringify(value));
-            //TODO: trigger submission of change here
+            bus.$emit('EventMessageLabelChanged', {
+                message: { ...this.details, labelId: value },
+            });
+        },
+        emailChanged(value) {
+            bus.$emit('EventEmailLabelChanged', {
+                message: { ...this.details, email: value },
+            });
         },
     },
     computed: {
@@ -63,6 +71,12 @@ export default {
             }));
         },
         details() {
+            console.log('Calculating details for ' + this.selectedItem || 'NA');
+            const emptyData = { email: '', name: '', label: '', labelId: '' };
+
+            if (!this.selectedItem) {
+                return emptyData;
+            }
             const data = this.submitted.find(s => s.id === this.selectedItem);
             if (data) {
                 return {
@@ -70,10 +84,27 @@ export default {
                     email: data.email,
                     label: data.label,
                     labelId: data.labelId,
+                    id: data.id,
                 };
             }
 
-            return { email: '', name: '', label: '', labelId: '' };
+            return emptyData;
+        },
+        selectedLabel: {
+            get() {
+                const data = this.details;
+                const fetchedLabel = this.labelsData.find(
+                    i => i.id === data.labelId,
+                );
+                if (!fetchedLabel) {
+                    return { value: '', text: '' };
+                }
+                return { value: data.labelId, text: fetchedLabel.name } || '';
+            },
+            set(newValue) {
+                console.log('New value is:' + newValue);
+                this.labelChanged(newValue);
+            },
         },
         labels() {
             return this.labelsData.map(item => ({

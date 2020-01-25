@@ -47,7 +47,12 @@
 <script>
 import PeachesListPane from './PeachesListPane';
 import PeachesDetailPane from './PeachesDetailPane';
-import { fetchLabels, fetchMessages } from './../controllers/fetch';
+import {
+    fetchLabels,
+    fetchMessages,
+    updateMessage,
+} from './../controllers/messages';
+import { bus } from '../main';
 
 export default {
     name: 'PeachesContainer',
@@ -56,6 +61,7 @@ export default {
         PeachesDetailPane,
     },
     async mounted() {
+        this.subscribe();
         this.statuses = Object.values(this.stateData);
         try {
             [this.labelsData, this.submittedData] = await Promise.all([
@@ -74,6 +80,26 @@ export default {
         },
         tabChanged(tab) {
             this.selectedTab = tab;
+        },
+        subscribe() {
+            bus.$on('EventMessageLabelChanged', payload => {
+                console.log(
+                    'Event EventMessageLabelChanged triggered: ' +
+                        JSON.stringify(payload),
+                );
+                updateMessage(payload, bus);
+            });
+            bus.$on('EventEmailLabelChanged', payload => {
+                console.log(
+                    'Event EventEmailLabelChanged triggered: ' +
+                        JSON.stringify(payload),
+                );
+                updateMessage(payload, bus);
+            });
+            bus.$on('ErrorConnection', payload => {
+                console.log('ErrorConnection raised: ' + payload.error);
+                this.error = payload.error;
+            });
         },
     },
     computed: {
@@ -117,7 +143,7 @@ export default {
     },
     data() {
         return {
-            selectedItem: '1',
+            selectedItem: '',
             loaded: false,
             labelFilter: '000',
             selectedTab: 1,
