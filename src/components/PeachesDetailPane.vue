@@ -1,6 +1,6 @@
 <template>
     <v-flex xs12 sm12>
-        <v-sheet>
+        <v-sheet v-if="selectedItem">
             Muuda andmeid:
             <v-select
                 :class="{ 'margin-left': '-180px' }"
@@ -23,8 +23,12 @@
                     :name="details.name"
                     :email="details.email"
                     :label="details.label"
+                    :messageId="details.id"
                 />
             </v-sheet>
+        </v-sheet>
+        <v-sheet v-else>
+            <p>Select message</p>
         </v-sheet>
     </v-flex>
 </template>
@@ -102,7 +106,6 @@ export default {
                 return { value: data.labelId, text: fetchedLabel.name } || '';
             },
             set(newValue) {
-                console.log('New value is:' + newValue);
                 this.labelChanged(newValue);
             },
         },

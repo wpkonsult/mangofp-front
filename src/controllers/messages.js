@@ -84,11 +84,18 @@ async function fetchMessages() {
 async function updateMessage(payload, bus) {
     console.log('Will submit payload: ' + JSON.stringify(payload));
     const id = payload.message.id;
-    await __makePutRequest('/messages/' + id, payload).catch(error => {
-        bus.$emit('ErrorConnection', {
-            error: error.message || 'Unidentified connection error',
-        });
-    });
+    const result = await __makePutRequest('/messages/' + id, payload).catch(
+        error => {
+            bus.$emit('ErrorConnection', {
+                error: error.message || 'Unidentified connection error',
+            });
+        },
+    );
+
+    if (result) {
+        console.log('Update received: ' + JSON.stringify(result));
+        bus.$emit('DataMessageUpdated', __makeMessage(result.message));
+    }
 }
 
 export { fetchLabels, fetchMessages, updateMessage };

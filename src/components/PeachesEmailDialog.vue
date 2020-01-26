@@ -59,6 +59,7 @@
     </v-row>
 </template>
 <script>
+import { bus } from '../main';
 export default {
     props: {
         actionName: {
@@ -80,6 +81,10 @@ export default {
         label: {
             type: String,
             required: false,
+        },
+        messageId: {
+            type: String,
+            required: true,
         },
         content: {
             type: Object,
@@ -115,12 +120,14 @@ export default {
             console.log('About to confirm and send email');
             console.log(this.emailContent);
             this.dialog = false;
-            //this.$emit('update:dialog', false);
         },
         confirm() {
             console.log('Just confirm');
             this.dialog = false;
-            //this.$emit('update:dialog', false);
+            bus.$emit('EventMessageStateChanged', {
+                messageId: this.$props.messageId,
+                newState: this.$props.actionCode,
+            });
         },
     },
     data() {

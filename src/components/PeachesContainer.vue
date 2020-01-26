@@ -80,25 +80,38 @@ export default {
         },
         tabChanged(tab) {
             this.selectedTab = tab;
+            this.selectedItem = '';
         },
         subscribe() {
             bus.$on('EventMessageLabelChanged', payload => {
-                console.log(
-                    'Event EventMessageLabelChanged triggered: ' +
-                        JSON.stringify(payload),
-                );
                 updateMessage(payload, bus);
             });
             bus.$on('EventEmailLabelChanged', payload => {
-                console.log(
-                    'Event EventEmailLabelChanged triggered: ' +
-                        JSON.stringify(payload),
-                );
                 updateMessage(payload, bus);
             });
+            bus.$on('EventMessageStateChanged', payload => {
+                updateMessage(
+                    {
+                        message: {
+                            id: payload.messageId,
+                            code: payload.newState,
+                        },
+                    },
+                    bus,
+                );
+            });
             bus.$on('ErrorConnection', payload => {
-                console.log('ErrorConnection raised: ' + payload.error);
                 this.error = payload.error;
+            });
+            bus.$on('DataMessageUpdated', message => {
+                const updateIndex = this.submittedData.findIndex(
+                    el => el.id === message.id,
+                );
+                if (updateIndex < 0) {
+                    this.submittedData.push(message);
+                } else {
+                    this.submittedData.splice(updateIndex, 1, message);
+                }
             });
         },
     },
