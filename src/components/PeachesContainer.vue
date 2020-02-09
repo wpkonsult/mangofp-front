@@ -51,6 +51,7 @@ import {
     fetchLabels,
     fetchMessages,
     updateMessage,
+    getStates,
 } from './../controllers/messages';
 import { bus } from '../main';
 
@@ -161,78 +162,7 @@ export default {
             labelFilter: '000',
             selectedTab: 1,
             statuses: [],
-            stateData: {
-                NEW: {
-                    order: 1,
-                    code: 'NEW',
-                    state: 'Uus',
-                    action: 'Määra uueks',
-                    next: [
-                        'REGISTERED',
-                        'WAIT4CONF',
-                        'WAIT4NEW',
-                        'WAIT4ACCEPT',
-                        'CANCELLED',
-                        'ARCHIVED',
-                    ],
-                },
-                REGISTERED: {
-                    order: 2,
-                    code: 'REGISTERED',
-                    state: 'Registreeritud',
-                    action: 'Registreeri',
-                    next: ['NOTIFIED', 'ARCHIVED', 'CANCELLED'],
-                },
-                WAIT4CONF: {
-                    order: 3,
-                    code: 'WAIT4CONF',
-                    state: 'Kinnitamisel',
-                    action: 'Saada kinnitamiseks',
-                    next: ['REGISTERED', 'CANCELLED'],
-                },
-                WAIT4NEW: {
-                    order: 4,
-                    code: 'WAIT4NEW',
-                    state: 'Vajab uut aega',
-                    action: 'Ootab uut aega',
-                    next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
-                },
-                WAIT4ACCEPT: {
-                    order: 5,
-                    code: 'WAIT4ACCEPT',
-                    state: 'Aeg pakutud',
-                    action: 'Paku uus aeg',
-                    next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
-                },
-                NOTIFIED: {
-                    order: 6,
-                    code: 'NOTIFIED',
-                    state: 'Teade saadetud',
-                    action: 'Saada meeldetuletus',
-                    next: ['FBASKED', 'ARCHIVED'],
-                },
-                FBASKED: {
-                    order: 7,
-                    code: 'FBASKED',
-                    state: 'Tagasiside küsitud',
-                    action: 'Küsi tagasiside',
-                    next: ['ARCHIVED'],
-                },
-                ARCHIVED: {
-                    order: 8,
-                    code: 'ARCHIVED',
-                    state: 'Arhiveeritud',
-                    action: 'Arhiveeri',
-                    next: [],
-                },
-                CANCELLED: {
-                    order: 9,
-                    code: 'CANCELLED',
-                    state: 'Katkestatud',
-                    action: 'Katkesta',
-                    next: ['ARCHIVED'],
-                },
-            },
+            stateData: getStates(),
             labelsData: [],
             submittedData: [],
             emailTemplates: {
