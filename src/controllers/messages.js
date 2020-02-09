@@ -32,10 +32,18 @@ async function __makeGetRequest(endpoint) {
 async function __makePutRequest(endpoint, payload) {
     const res = await axios.put(ROOT_URL + endpoint, payload);
     if (!res || res.status !== 200) {
-        throw new Error('Unable to post data to ' + endpoint);
+        throw new Error('Error received from request. Details: ' + endpoint);
     }
 
-    return res.data;
+    if (
+        !('status' in res.data) ||
+        res.data.status !== 'RESULT_SUCCESS' ||
+        !('payload' in res.data)
+    ) {
+        throw new Error('Could not read response status');
+    }
+
+    return res.data.payload;
 }
 
 async function fetchLabels() {
