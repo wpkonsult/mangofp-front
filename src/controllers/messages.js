@@ -91,7 +91,6 @@ async function fetchMessages() {
 }
 
 async function updateMessage(payload, bus) {
-    console.log('Will submit payload: ' + JSON.stringify(payload));
     const id = payload.message.id;
     const result = await __makePutRequest('/messages/' + id, payload).catch(
         error => {
@@ -102,7 +101,6 @@ async function updateMessage(payload, bus) {
     );
 
     if (result) {
-        console.log('Update received: ' + JSON.stringify(result));
         bus.$emit('DataMessageUpdated', __makeMessage(result.message));
     }
 }

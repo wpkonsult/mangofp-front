@@ -75,7 +75,6 @@ export default {
             }));
         },
         details() {
-            console.log('Calculating details for ' + this.selectedItem || 'NA');
             const emptyData = { email: '', name: '', label: '', labelId: '' };
 
             if (!this.selectedItem) {

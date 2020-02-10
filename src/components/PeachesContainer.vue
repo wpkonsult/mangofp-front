@@ -71,7 +71,6 @@ export default {
             ]);
             this.loaded = true;
         } catch (e) {
-            console.log('Error: ' + e.message);
             this.error = e.message;
         }
     },

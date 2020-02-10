@@ -117,12 +117,9 @@ export default {
             return content;
         },
         confirmAndSend() {
-            console.log('About to confirm and send email');
-            console.log(this.emailContent);
             this.dialog = false;
         },
         confirm() {
-            console.log('Just confirm');
             this.dialog = false;
             bus.$emit('EventMessageStateChanged', {
                 messageId: this.$props.messageId,
