@@ -16,7 +16,7 @@
                 @change="emailChanged"
             ></v-text-field>
             <v-sheet v-for="action in actions" :key="action.code">
-                <PeachesEmailDialog
+                <MangoFpEmailDialog
                     :actionName="action.name"
                     :actionCode="action.code"
                     :content="emailTemplates[action.code]"
@@ -34,13 +34,13 @@
 </template>
 
 <script>
-import PeachesEmailDialog from './PeachesEmailDialog';
+import MangoFpEmailDialog from './MangoFpEmailDialog';
 import { bus } from '../main';
 
 export default {
-    name: 'PeachesDetailPane',
+    name: 'MangoFpDetailPane',
     components: {
-        PeachesEmailDialog,
+        MangoFpEmailDialog,
     },
     methods: {
         labelChanged(value) {

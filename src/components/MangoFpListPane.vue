@@ -13,7 +13,7 @@
                         <td>{{ item.state }}</td>
                         <td>{{ item.email }}</td>
                         <td>
-                            <PeachesMessageInList
+                            <MangoFpMessageInList
                                 v-bind:content="item.content"
                             />
                         </td>
@@ -26,12 +26,12 @@
 </template>
 
 <script>
-import PeachesMessageInList from './PeachesMessageInLinst';
+import MangoFpMessageInList from './MangoFpMessageInLinst';
 
 export default {
-    name: 'PeachesListPane',
+    name: 'MangoFpListPane',
     components: {
-        PeachesMessageInList,
+        MangoFpMessageInList,
     },
     methods: {
         selectItem: function(item) {

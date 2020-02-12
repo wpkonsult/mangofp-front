@@ -7,7 +7,7 @@
 </template>
 <script>
 export default {
-    name: 'PeachesMessageInList',
+    name: 'MangoFpMessageInList',
     props: {
         content: {
             type: Array,

@@ -16,7 +16,7 @@
                     <h2>{{ status.state }}</h2>
                     <v-row align="stretch">
                         <v-col cols="6" md="8">
-                            <PeachesListPane
+                            <MangoFpListPane
                                 value="0"
                                 :submitted="filtered"
                                 :selectedItem="selectedItem"
@@ -25,7 +25,7 @@
                             />
                         </v-col>
                         <v-col cols="6" md="4">
-                            <PeachesDetailPane
+                            <MangoFpDetailPane
                                 :selectedItem="selectedItem"
                                 :submitted="submitted"
                                 :labelsData="labelsData"
@@ -45,8 +45,8 @@
 </template>
 
 <script>
-import PeachesListPane from './PeachesListPane';
-import PeachesDetailPane from './PeachesDetailPane';
+import MangoFpListPane from './MangoFpListPane';
+import MangoFpDetailPane from './MangoFpDetailPane';
 import {
     fetchLabels,
     fetchMessages,
@@ -56,10 +56,10 @@ import {
 import { bus } from '../main';
 
 export default {
-    name: 'PeachesContainer',
+    name: 'MangoFpContainer',
     components: {
-        PeachesListPane,
-        PeachesDetailPane,
+        MangoFpListPane,
+        MangoFpDetailPane,
     },
     async mounted() {
         this.subscribe();

@@ -30,7 +30,7 @@ async function __makeGetRequest(endpoint) {
 //}
 
 async function __makePutRequest(endpoint, payload) {
-    const res = await axios.put(ROOT_URL + endpoint, payload);
+    const res = await axios.post(ROOT_URL + endpoint, payload);
     if (!res || res.status !== 200) {
         throw new Error('Error received from request. Details: ' + endpoint);
     }
