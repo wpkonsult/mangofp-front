@@ -11,6 +11,7 @@
                     >
                         <td>{{ item.label }}</td>
                         <td>{{ item.state }}</td>
+                        <td>{{ item.name }}</td>
                         <td>{{ item.email }}</td>
                         <td>
                             <MangoFpMessageInList
@@ -53,6 +54,7 @@ export default {
         headers: [
             { text: 'Teema', align: 'left', value: 'label', width: '1%' },
             { text: 'Olek', align: 'left', value: 'state', width: '1%' },
+            { text: 'Nimi', align: 'left', value: 'name', width: '1%' },
             { text: 'Email', align: 'left', value: 'email', width: '1%' },
             { text: 'Sisu', align: 'left', value: 'content', width: '80%' },
             { text: '', align: 'left', value: '' },
