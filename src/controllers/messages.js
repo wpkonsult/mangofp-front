@@ -29,7 +29,7 @@ async function __makeGetRequest(endpoint) {
 //    return res.data;
 //}
 
-async function __makePutRequest(endpoint, payload) {
+async function __makePostRequest(endpoint, payload) {
     const res = await axios.post(ROOT_URL + endpoint, payload);
     if (!res || res.status !== 200) {
         throw new Error('Error received from request. Details: ' + endpoint);
@@ -91,8 +91,23 @@ async function fetchMessages() {
 }
 
 async function updateMessage(payload, bus) {
-    const id = payload.message.id;
-    const result = await __makePutRequest('/messages/' + id, payload).catch(
+    const data = {
+        id: payload.message.id,
+        message: {
+            id: payload.message.id,
+            code: payload.message.code,
+        },
+        email: false,
+    };
+    if ('emailContent' in payload.message && 'addresses' in payload.message) {
+        data.email = {
+            content: payload.message.emailContent,
+            addresses: payload.message.addresses,
+            subject: payload.message.emailSubject || '',
+        };
+    }
+
+    const result = await __makePostRequest('/messages/' + data.id, data).catch(
         error => {
             bus.$emit('ErrorConnection', {
                 error: error.message || 'Unidentified connection error',

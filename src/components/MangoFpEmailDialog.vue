@@ -114,10 +114,19 @@ export default {
             ];
 
             this.emailContent = content;
+            //TODO make email subject configurable
+            this.emailSubject = 'Email from MangoFP (make this configurable)';
             return content;
         },
         confirmAndSend() {
             this.dialog = false;
+            bus.$emit('EventSendEmailAndChangeState', {
+                messageId: this.$props.messageId,
+                newState: this.$props.actionCode,
+                emailContent: this.emailContent,
+                emailSubject: this.emailSubject,
+                addresses: this.addresses,
+            });
         },
         confirm() {
             this.dialog = false;

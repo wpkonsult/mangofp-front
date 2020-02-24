@@ -108,6 +108,20 @@ export default {
                     bus,
                 );
             });
+            bus.$on('EventSendEmailAndChangeState', payload => {
+                updateMessage(
+                    {
+                        message: {
+                            id: payload.messageId,
+                            code: payload.newState,
+                            emailContent: payload.emailContent,
+                            addresses: payload.addresses,
+                            emailSubject: payload.emailSubject,
+                        },
+                    },
+                    bus,
+                );
+            });
             bus.$on('ErrorConnection', payload => {
                 this.error = payload.error;
             });
