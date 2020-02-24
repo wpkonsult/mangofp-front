@@ -15,7 +15,7 @@
                 <v-tab-item v-for="status in statuses" :key="status.code">
                     <h2>{{ status.state }}</h2>
                     <v-row align="stretch">
-                        <v-col cols="6" md="8">
+                        <v-col :cols="listWidth">
                             <MangoFpListPane
                                 value="0"
                                 :submitted="filtered"
@@ -24,7 +24,7 @@
                                 @row-selected="rowSelected"
                             />
                         </v-col>
-                        <v-col cols="6" md="4">
+                        <v-col v-if="selectedItem" cols="6">
                             <MangoFpDetailPane
                                 :selectedItem="selectedItem"
                                 :submitted="submitted"
@@ -75,12 +75,20 @@ export default {
         }
     },
     methods: {
+        openSidePane() {
+            this.listWidth = '6';
+        },
+        closeSidePane() {
+            this.listWidth = '12';
+        },
         rowSelected(item) {
             this.selectedItem = item.id;
+            this.openSidePane();
         },
         tabChanged(tab) {
             this.selectedTab = tab;
             this.selectedItem = '';
+            this.closeSidePane();
         },
         subscribe() {
             bus.$on('EventMessageLabelChanged', payload => {
@@ -157,6 +165,7 @@ export default {
     data() {
         return {
             selectedItem: '',
+            listWidth: '12',
             loaded: false,
             labelFilter: '000',
             selectedTab: 1,
