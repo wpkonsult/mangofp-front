@@ -1,46 +1,65 @@
 <template>
     <v-flex xs12 sm12>
-        <v-sheet v-if="selectedItem">
-            Muuda andmeid:
-            <v-select
-                :class="{ 'margin-left': '-180px' }"
-                :items="labels"
-                v-model="selectedLabel"
-                label="Teema"
-            >
-            </v-select>
-            <v-text-field
-                class="emailInput"
-                v-model="details.email"
-                label="Email"
-                @change="emailChanged"
-            ></v-text-field>
-            <v-sheet v-for="action in actions" :key="action.code">
-                <MangoFpEmailDialog
-                    :actionName="action.name"
-                    :actionCode="action.code"
-                    :content="emailTemplates[action.code]"
-                    :name="details.name"
-                    :email="details.email"
-                    :label="details.label"
-                    :messageId="details.id"
+        <v-tabs vertical>
+            <v-tab>
+                <v-icon left>mdi-email-edit-outline</v-icon>
+            </v-tab>
+            <v-tab>
+                <v-icon left>mdi-history</v-icon>
+            </v-tab>
+            <v-tab-item>
+                <v-sheet v-if="selectedItem">
+                    Muuda andmeid:
+                    <v-select
+                        :class="{ 'margin-left': '-180px' }"
+                        :items="labels"
+                        v-model="selectedLabel"
+                        label="Teema"
+                    >
+                    </v-select>
+                    <v-text-field
+                        class="emailInput"
+                        v-model="details.email"
+                        label="Email"
+                        @change="emailChanged"
+                    ></v-text-field>
+                    <v-sheet v-for="action in actions" :key="action.code">
+                        <MangoFpEmailDialog
+                            :actionName="action.name"
+                            :actionCode="action.code"
+                            :content="emailTemplates[action.code]"
+                            :name="details.name"
+                            :email="details.email"
+                            :label="details.label"
+                            :messageId="details.id"
+                        />
+                    </v-sheet>
+                </v-sheet>
+            </v-tab-item>
+            <v-tab-item>
+                <MangoFpStateSelector
+                    :selectedTab="selectedTab"
+                    :statuses="statuses"
+                    :contactDetails="details"
+                    :emailTemplates="emailTemplates"
+                    :details="details"
                 />
-            </v-sheet>
-        </v-sheet>
-        <v-sheet v-else>
-            <p>Select message</p>
-        </v-sheet>
+            </v-tab-item>
+        </v-tabs>
     </v-flex>
 </template>
 
 <script>
 import MangoFpEmailDialog from './MangoFpEmailDialog';
+import MangoFpStateSelector from './MangoFpStateSelector';
+
 import { bus } from '../main';
 
 export default {
     name: 'MangoFpDetailPane',
     components: {
         MangoFpEmailDialog,
+        MangoFpStateSelector,
     },
     methods: {
         labelChanged(value) {
