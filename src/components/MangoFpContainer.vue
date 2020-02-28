@@ -98,7 +98,7 @@ export default {
                 updateMessage(payload, bus);
             });
             bus.$on('EventMessageStateChanged', payload => {
-                updateMessage(
+                const success = updateMessage(
                     {
                         message: {
                             id: payload.messageId,
@@ -107,9 +107,13 @@ export default {
                     },
                     bus,
                 );
+                if (success) {
+                    this.selectedItem = '';
+                    this.closeSidePane();
+                }
             });
             bus.$on('EventSendEmailAndChangeState', payload => {
-                updateMessage(
+                const success = updateMessage(
                     {
                         message: {
                             id: payload.messageId,
@@ -121,6 +125,10 @@ export default {
                     },
                     bus,
                 );
+                if (success) {
+                    this.selectedItem = '';
+                }
+                this.closeSidePane();
             });
             bus.$on('ErrorConnection', payload => {
                 this.error = payload.error;

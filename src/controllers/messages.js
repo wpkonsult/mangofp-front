@@ -118,6 +118,8 @@ async function updateMessage(payload, bus) {
     if (result) {
         bus.$emit('DataMessageUpdated', __makeMessage(result.message));
     }
+
+    return result;
 }
 
 function getStates() {

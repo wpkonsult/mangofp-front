@@ -1,87 +1,96 @@
 <template>
-    <v-row>
-        <v-select
-            :class="{ 'margin-left': '-180px' }"
-            :items="actions"
-            label="Vali tegevus"
-            @change="actionSelected"
-        >
-        </v-select>
-        <v-dialog v-model="emailDialog" scrollable max-width="600px">
-            <v-card v-if="emailContent">
-                <v-card-title
-                    >Send message and set to "{{ actionName }}"
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-card-text style="height: 500px;">
-                    <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
+    <v-container>
+        <v-row>
+            <v-select
+                :class="{ 'margin-left': '-180px' }"
+                :items="actions"
+                label="Vali tegevus"
+                v-model="actionObj"
+                @change="actionSelected"
+            >
+            </v-select>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-card v-if="emailContent">
+                    <v-card-title>
+                        {{ actionName }}
+                    </v-card-title>
                     <v-divider></v-divider>
-                    <v-textarea
-                        filled
-                        name="email-text"
-                        label="Email content"
-                        no-resize
-                        rows="20"
-                        v-model="emailContent"
-                    ></v-textarea>
-                    <v-divider></v-divider>
-                </v-card-text>
-                <v-card-actions>
-                    <v-btn
-                        color="blue darken-1"
-                        outlined
-                        @click.native="confirm"
-                    >
+                    <v-card-text style="height: 300px;">
+                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
+                        <v-textarea
+                            name="email-text"
+                            no-resize
+                            rows="8"
+                            dense
+                            v-model="emailContent"
+                        ></v-textarea>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn
+                            color="blue darken-1"
+                            outlined
+                            @click.native="confirm"
+                        >
+                            Confirm
+                        </v-btn>
+                        <v-btn
+                            color="blue darken-1"
+                            outlined
+                            @click.native="confirmAndSend"
+                        >
+                            Confirm and send
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+                <v-card v-else>
+                    <v-card-title>{{ actionName }}</v-card-title>
+                    <v-card-text style="height: 100px;">
+                        <p>
+                            Please confirm, that message will be set to state
+                            "{{ actionName }}"
+                        </p>
+                    </v-card-text>
+                    <v-btn outlined color="success" @click.native="confirm">
                         Confirm
                     </v-btn>
-                    <v-btn
-                        color="blue darken-1"
-                        outlined
-                        @click.native="confirmAndSend"
-                    >
-                        Confirm and send
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-            <v-card v-else>
-                <v-card-title> Set to "{{ actionName }}"</v-card-title>
-                <v-card-text style="height: 500px;">
-                    <p>
-                        Please confirm, that message will be set to state "{{
-                            actionName
-                        }}"
-                    </p>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-btn outlined color="success" @click.native="confirm">
-                    Confirm
-                </v-btn>
-            </v-card>
-        </v-dialog>
-    </v-row>
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
+import { bus } from '../main';
 export default {
     name: 'MangoFpStateSelector',
     data() {
         return {
-            emailDialog: false,
             emailContent: '',
+            emailSubject: '',
             addresses: [],
             actionName: '',
+            actionObj: { value: '', text: '' },
         };
     },
     methods: {
+        clear() {
+            this.emailContent = '';
+            this.addresses = [];
+            this.actionName = '';
+            this.emailSubject = '';
+            this.actionObj = { value: '', text: '' };
+        },
         actionSelected(value) {
-            console.log('Action changed: ' + value);
             const shortcodes = ['name', 'label', 'email'];
             let content = '';
-            console.log(
-                'emailTemplates: ' + JSON.stringify(this.emailTemplates[value]),
-            );
             if (value in this.emailTemplates) {
                 content = this.emailTemplates[value].template;
+                this.addresses = [
+                    this.details.email,
+                    ...this.emailTemplates[value].addresses,
+                ];
             }
             shortcodes.forEach(element => {
                 content = content.replace(
@@ -91,8 +100,30 @@ export default {
             });
 
             this.emailContent = content;
-            this.emailDialog = true;
-            this.actionName = this.statuses[this.selectedTab].action;
+            this.emailSubject = 'Re: ' + this.details.label;
+
+            const foundAction = this.actions.find(
+                action => action.value === value,
+            );
+            this.actionName = foundAction.text;
+            this.actionObj = foundAction;
+        },
+        confirmAndSend() {
+            this.dialog = false;
+            bus.$emit('EventSendEmailAndChangeState', {
+                messageId: this.details.id,
+                newState: this.actionObj.value,
+                emailContent: this.emailContent,
+                emailSubject: this.emailSubject,
+                addresses: this.addresses,
+            });
+        },
+        confirm() {
+            this.dialog = false;
+            bus.$emit('EventMessageStateChanged', {
+                messageId: this.details.id,
+                newState: this.actionObj.value,
+            });
         },
     },
     computed: {
@@ -132,6 +163,16 @@ export default {
         details: {
             type: Object,
             required: true,
+        },
+    },
+    created() {
+        this.actionSelected(this.actions[0].value);
+    },
+    watch: {
+        details(newDetails) {
+            if (newDetails) {
+                this.actionSelected(this.actions[0].value);
+            }
         },
     },
 };

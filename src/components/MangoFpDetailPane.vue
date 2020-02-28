@@ -2,11 +2,20 @@
     <v-flex xs12 sm12>
         <v-tabs vertical>
             <v-tab>
-                <v-icon left>mdi-email-edit-outline</v-icon>
-            </v-tab>
-            <v-tab>
                 <v-icon left>mdi-history</v-icon>
             </v-tab>
+            <v-tab>
+                <v-icon left>mdi-email-edit-outline</v-icon>
+            </v-tab>
+            <v-tab-item>
+                <MangoFpStateSelector
+                    :selectedTab="selectedTab"
+                    :statuses="statuses"
+                    :contactDetails="details"
+                    :emailTemplates="emailTemplates"
+                    :details="details"
+                />
+            </v-tab-item>
             <v-tab-item>
                 <v-sheet v-if="selectedItem">
                     Muuda andmeid:
@@ -35,15 +44,6 @@
                         />
                     </v-sheet>
                 </v-sheet>
-            </v-tab-item>
-            <v-tab-item>
-                <MangoFpStateSelector
-                    :selectedTab="selectedTab"
-                    :statuses="statuses"
-                    :contactDetails="details"
-                    :emailTemplates="emailTemplates"
-                    :details="details"
-                />
             </v-tab-item>
         </v-tabs>
     </v-flex>
