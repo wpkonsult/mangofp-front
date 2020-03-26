@@ -5,9 +5,12 @@
                 <v-icon left>mdi-history</v-icon>
             </v-tab>
             <v-tab>
-                <v-icon left>mdi-email-edit-outline</v-icon>
+                <v-icon left>mdi-border-color</v-icon>
             </v-tab>
-            <v-tab-item>
+            <v-tab>
+                <v-icon left>mdi-email-outline</v-icon>
+            </v-tab>
+            <v-tab-item transition="fade-transition" reverse-transition="false">
                 <MangoFpStateSelector
                     :selectedTab="selectedTab"
                     :statuses="statuses"
@@ -15,8 +18,10 @@
                     :emailTemplates="emailTemplates"
                     :details="details"
                 />
+                <MangoFpEmailHistory :history="details.changeHistory || []">
+                </MangoFpEmailHistory>
             </v-tab-item>
-            <v-tab-item>
+            <v-tab-item transition="fade-transition" reverse-transition="false">
                 <v-sheet v-if="selectedItem">
                     Muuda andmeid:
                     <v-select
@@ -32,34 +37,34 @@
                         label="Email"
                         @change="emailChanged"
                     ></v-text-field>
-                    <v-sheet v-for="action in actions" :key="action.code">
-                        <MangoFpEmailDialog
-                            :actionName="action.name"
-                            :actionCode="action.code"
-                            :content="emailTemplates[action.code]"
-                            :name="details.name"
-                            :email="details.email"
-                            :label="details.label"
-                            :messageId="details.id"
-                        />
-                    </v-sheet>
                 </v-sheet>
+            </v-tab-item>
+            <v-tab-item transition="fade-transition" reverse-transition="false">
+                <MangoFpEmail
+                    :selectedTab="selectedTab"
+                    :contactDetails="details"
+                    :emailTemplates="emailTemplates"
+                    :details="details"
+                />
+                <MangoFpEmailHistory :history="details.changeHistory || []">
+                </MangoFpEmailHistory>
             </v-tab-item>
         </v-tabs>
     </v-flex>
 </template>
 
 <script>
-import MangoFpEmailDialog from './MangoFpEmailDialog';
 import MangoFpStateSelector from './MangoFpStateSelector';
-
+import MangoFpEmailHistory from './MangoFpEmailHistory';
+import MangoFpEmail from './MangoFpEmail';
 import { bus } from '../main';
 
 export default {
     name: 'MangoFpDetailPane',
     components: {
-        MangoFpEmailDialog,
         MangoFpStateSelector,
+        MangoFpEmailHistory,
+        MangoFpEmail,
     },
     methods: {
         labelChanged(value) {
@@ -107,6 +112,7 @@ export default {
                     label: data.label,
                     labelId: data.labelId,
                     id: data.id,
+                    changeHistory: data.changeHistory,
                 };
             }
 
