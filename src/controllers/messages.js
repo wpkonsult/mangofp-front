@@ -1,7 +1,7 @@
-/*globals RESOURCES:false */
+/*globals MANGOFP_RESOURCES:false */
 import axios from 'axios';
 
-const ROOT_URL = RESOURCES['adminUrl'];
+const ROOT_URL = MANGOFP_RESOURCES['adminUrl'];
 
 async function __makeGetRequest(endpoint) {
     const res = await axios.get(ROOT_URL + endpoint);
@@ -19,15 +19,6 @@ async function __makeGetRequest(endpoint) {
 
     return res.data.payload;
 }
-
-//async function __makePostRequest(endpoint, payload) {
-//    const res = await axios.post(ROOT_URL + endpoint, payload);
-//    if (!res || res.status !== 200) {
-//        throw new Error('Unable to post data to ' + endpoint);
-//    }
-//
-//    return res.data;
-//}
 
 async function __makePostRequest(endpoint, payload) {
     const res = await axios.post(ROOT_URL + endpoint, payload);
@@ -63,7 +54,7 @@ async function fetchLabels() {
 
 function __makeMessage(element) {
     const states = getStates();
-    return {
+    const data = {
         id: element.id,
         form: element.form,
         labelId: element.labelId,
@@ -73,6 +64,12 @@ function __makeMessage(element) {
         name: element.name,
         content: Object.entries(JSON.parse(element.content)),
     };
+
+    if ('changeHistory' in element) {
+        data.changeHistory = element.changeHistory;
+    }
+
+    return data;
 }
 
 async function fetchMessages() {
@@ -81,13 +78,41 @@ async function fetchMessages() {
     if (!('messages' in data) || !Array.isArray(data.messages)) {
         throw new Error('No messages found in response');
     }
-
     const messages = [];
     data.messages.forEach(element => {
         messages.push(__makeMessage(element));
     });
-
     return messages;
+}
+
+async function sendEmail(payload, bus) {
+    const data = {
+        id: payload.message.id,
+        message: {
+            id: payload.message.id,
+        },
+        email: {
+            content: payload.message.emailContent,
+            addresses: payload.message.addresses,
+            subject: payload.message.emailSubject || '',
+            attachments: payload.message.emailAttachments,
+        },
+    };
+
+    const result = await __makePostRequest(
+        '/messages/' + data.id + '/emails',
+        data,
+    ).catch(error => {
+        bus.$emit('ErrorConnection', {
+            error: error.message || 'Unidentified connection error',
+        });
+    });
+
+    if (result) {
+        bus.$emit('DataMessageUpdated', __makeMessage(result.message));
+    }
+
+    return result;
 }
 
 async function updateMessage(payload, bus) {
@@ -96,6 +121,8 @@ async function updateMessage(payload, bus) {
         message: {
             id: payload.message.id,
             code: payload.message.code,
+            email: payload.message.email,
+            labelId: payload.message.labelId,
         },
         email: false,
     };
@@ -104,6 +131,7 @@ async function updateMessage(payload, bus) {
             content: payload.message.emailContent,
             addresses: payload.message.addresses,
             subject: payload.message.emailSubject || '',
+            attachments: payload.message.emailAttachments,
         };
     }
 
@@ -114,6 +142,24 @@ async function updateMessage(payload, bus) {
             });
         },
     );
+
+    if (result) {
+        bus.$emit('DataMessageUpdated', __makeMessage(result.message));
+    }
+
+    return result;
+}
+
+async function getMessage(id, bus) {
+    if (!id) {
+        bus.emit('ErrorConnection', { error: 'no id for get request' });
+    }
+
+    const result = await __makeGetRequest('/messages/' + id).catch(error => {
+        bus.$emit('ErrorConnection', {
+            error: error.message || 'Unidentified connection error',
+        });
+    });
 
     if (result) {
         bus.$emit('DataMessageUpdated', __makeMessage(result.message));
@@ -135,6 +181,7 @@ function getStates() {
                 'WAIT4NEW',
                 'WAIT4ACCEPT',
                 'CANCELLED',
+                'NEWSLETTER',
                 'ARCHIVED',
             ],
         },
@@ -148,15 +195,15 @@ function getStates() {
         WAIT4CONF: {
             order: 3,
             code: 'WAIT4CONF',
-            state: 'Kinnitamisel',
-            action: 'Saada kinnitamiseks',
+            state: 'TTA kaudu',
+            action: 'TTA kaudu',
             next: ['REGISTERED', 'CANCELLED'],
         },
         WAIT4NEW: {
             order: 4,
             code: 'WAIT4NEW',
-            state: 'Vajab uut aega',
-            action: 'Ootab uut aega',
+            state: 'Ooteleht',
+            action: 'Ooteleht',
             next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
         },
         WAIT4ACCEPT: {
@@ -180,15 +227,22 @@ function getStates() {
             action: 'Küsi tagasiside',
             next: ['ARCHIVED'],
         },
-        ARCHIVED: {
+        NEWSLETTER: {
             order: 8,
+            code: 'NEWSLETTER',
+            state: 'Uudiskiri',
+            action: 'Uudiskiri',
+            next: ['ARCHIVED'],
+        },
+        ARCHIVED: {
+            order: 9,
             code: 'ARCHIVED',
             state: 'Arhiveeritud',
             action: 'Arhiveeri',
             next: [],
         },
         CANCELLED: {
-            order: 9,
+            order: 10,
             code: 'CANCELLED',
             state: 'Katkestatud',
             action: 'Katkesta',
@@ -197,4 +251,11 @@ function getStates() {
     };
 }
 
-export { fetchLabels, fetchMessages, updateMessage, getStates };
+export {
+    fetchLabels,
+    fetchMessages,
+    updateMessage,
+    getStates,
+    getMessage,
+    sendEmail,
+};

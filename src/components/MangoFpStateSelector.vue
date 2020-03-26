@@ -4,7 +4,7 @@
             <v-select
                 :class="{ 'margin-left': '-180px' }"
                 :items="actions"
-                label="Vali tegevus"
+                :label="$locStr('State')"
                 v-model="actionObj"
                 @change="actionSelected"
             >
@@ -33,16 +33,31 @@
                             outlined
                             @click.native="confirm"
                         >
-                            Confirm
+                            {{ $locStr('Confirm') }}
                         </v-btn>
                         <v-btn
                             color="blue darken-1"
                             outlined
                             @click.native="confirmAndSend"
                         >
-                            Confirm and send
+                            {{ $locStr('Confirm and send') }}
                         </v-btn>
+                        <MangoFpAttachment
+                            @attachmentsReceived="addAttachments"
+                        />
                     </v-card-actions>
+                    <v-chip
+                        class="ma-2"
+                        color="primary"
+                        label
+                        close
+                        v-for="attachment in attachments"
+                        :key="attachment.id"
+                        @click:close="removeAttachment(attachment.id)"
+                        @click="downloadAttachment(attachment.url)"
+                    >
+                        {{ attachment.file_name }}
+                    </v-chip>
                 </v-card>
                 <v-card v-else>
                     <v-card-title>{{ actionName }}</v-card-title>
@@ -53,7 +68,7 @@
                         </p>
                     </v-card-text>
                     <v-btn outlined color="success" @click.native="confirm">
-                        Confirm
+                        {{ $locStr('Confirm') }}
                     </v-btn>
                 </v-card>
             </v-col>
@@ -63,8 +78,13 @@
 
 <script>
 import { bus } from '../main';
+import MangoFpAttachment from './MangoFpAttachment';
+
 export default {
     name: 'MangoFpStateSelector',
+    components: {
+        MangoFpAttachment,
+    },
     data() {
         return {
             emailContent: '',
@@ -72,6 +92,7 @@ export default {
             addresses: [],
             actionName: '',
             actionObj: { value: '', text: '' },
+            attachments: [],
         };
     },
     methods: {
@@ -116,6 +137,7 @@ export default {
                 emailContent: this.emailContent,
                 emailSubject: this.emailSubject,
                 addresses: this.addresses,
+                emailAttachments: this.attachments.map(rec => rec.server_path),
             });
         },
         confirm() {
@@ -124,6 +146,22 @@ export default {
                 messageId: this.details.id,
                 newState: this.actionObj.value,
             });
+        },
+        addAttachments(files) {
+            this.attachments = [...this.attachments, ...files];
+        },
+        removeAttachment(attachmentId) {
+            this.attachments = this.attachments.filter(
+                obj => obj.id !== attachmentId,
+            );
+        },
+        downloadAttachment(attachmentUrl) {
+            let a = document.createElement('a');
+            a.href = attachmentUrl;
+            a.download = attachmentUrl.split('/').pop();
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         },
     },
     computed: {
