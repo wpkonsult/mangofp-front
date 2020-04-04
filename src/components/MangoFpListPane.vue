@@ -10,9 +10,10 @@
                         :class="{ selectedLine: selectedItem === item.id }"
                     >
                         <td>{{ item.label }}</td>
-                        <td>{{ item.state }}</td>
+                        <td>{{ item.note }}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.email }}</td>
+                        <td>{{ item.lastUpdated }}</td>
                         <td>
                             <MangoFpMessageInList
                                 v-bind:content="item.content"
@@ -49,17 +50,45 @@ export default {
             required: true,
         },
     },
-    data: () => ({
-        search: '',
-        headers: [
-            { text: 'Teema', align: 'left', value: 'label', width: '1%' },
-            { text: 'Olek', align: 'left', value: 'state', width: '1%' },
-            { text: 'Nimi', align: 'left', value: 'name', width: '1%' },
-            { text: 'Email', align: 'left', value: 'email', width: '1%' },
-            { text: 'Sisu', align: 'left', value: 'content', width: '80%' },
-            { text: '', align: 'left', value: '' },
-        ],
-    }),
+    data() {
+        return {
+            search: '',
+            headers: [
+                {
+                    text: this.$locStr('Label'),
+                    align: 'left',
+                    value: 'label',
+                    width: '20%',
+                },
+                {
+                    text: this.$locStr('Note'),
+                    align: 'left',
+                    value: 'note',
+                    width: '10%',
+                },
+                {
+                    text: this.$locStr('Name'),
+                    align: 'left',
+                    value: 'name',
+                    width: '10%',
+                },
+                {
+                    text: this.$locStr('Email'),
+                    align: 'left',
+                    value: 'email',
+                    width: '10%',
+                },
+                {
+                    text: this.$locStr('Updated'),
+                    align: 'left',
+                    value: 'lastUpdated',
+                    width: '10%',
+                },
+                { text: 'Sisu', align: 'left', value: 'content', width: '40%' },
+                { text: '', align: 'left', value: '' },
+            ],
+        };
+    },
 };
 </script>
 <style>

@@ -62,6 +62,8 @@ function __makeMessage(element) {
         state: element.code in states ? states[element.code].state : '??',
         email: element.email,
         name: element.name,
+        note: element.note,
+        lastUpdated: element.lastUpdated,
         content: Object.entries(JSON.parse(element.content)),
     };
 
@@ -123,6 +125,7 @@ async function updateMessage(payload, bus) {
             code: payload.message.code,
             email: payload.message.email,
             labelId: payload.message.labelId,
+            note: payload.message.note,
         },
         email: false,
     };
