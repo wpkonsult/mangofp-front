@@ -23,19 +23,25 @@
             </v-tab-item>
             <v-tab-item transition="fade-transition" reverse-transition="false">
                 <v-sheet v-if="selectedItem">
-                    Muuda andmeid:
+                    {{ $locStr('Change') }}
                     <v-select
                         :class="{ 'margin-left': '-180px' }"
                         :items="labels"
                         v-model="selectedLabel"
-                        label="Teema"
+                        :label="$locStr('Label')"
                     >
                     </v-select>
                     <v-text-field
-                        class="emailInput"
+                        class="detailField"
                         v-model="details.email"
-                        label="Email"
+                        :label="$locStr('Email')"
                         @change="emailChanged"
+                    ></v-text-field>
+                    <v-text-field
+                        class="detailField"
+                        v-model="details.note"
+                        :label="$locStr('Note')"
+                        @change="noteChanged"
                     ></v-text-field>
                 </v-sheet>
             </v-tab-item>
@@ -77,6 +83,11 @@ export default {
                 message: { ...this.details, email: value },
             });
         },
+        noteChanged(value) {
+            bus.$emit('EventNoteChanged', {
+                message: { ...this.details, note: value },
+            });
+        },
     },
     computed: {
         actions() {
@@ -99,7 +110,13 @@ export default {
             }));
         },
         details() {
-            const emptyData = { email: '', name: '', label: '', labelId: '' };
+            const emptyData = {
+                email: '',
+                name: '',
+                label: '',
+                labelId: '',
+                note: '',
+            };
 
             if (!this.selectedItem) {
                 return emptyData;
@@ -112,6 +129,7 @@ export default {
                     label: data.label,
                     labelId: data.labelId,
                     id: data.id,
+                    note: data.note,
                     changeHistory: data.changeHistory,
                 };
             }
@@ -169,8 +187,10 @@ export default {
 };
 </script>
 <style>
-.emailInput input {
+.detailField input,
+.detailField input:focus {
     margin-top: 5px;
     border-style: hidden;
+    box-shadow: 0 0 0 transparent;
 }
 </style>

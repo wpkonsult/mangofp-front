@@ -122,6 +122,17 @@ export default {
                     bus,
                 );
             });
+            bus.$on('EventNoteChanged', payload => {
+                updateMessage(
+                    {
+                        message: {
+                            id: payload.message.id,
+                            note: payload.message.note,
+                        },
+                    },
+                    bus,
+                );
+            });
             bus.$on('EventMessageStateChanged', payload => {
                 const success = updateMessage(
                     {
@@ -192,18 +203,13 @@ export default {
                 labelsObj[elem.id] = elem.name;
             });
 
-            return this.submittedData.map(elem => ({
-                id: elem.id,
-                form: elem.form,
-                labelId: elem.labelId,
+            const ret = this.submittedData.map(elem => ({
+                ...elem,
                 label: labelsObj[elem.labelId] || '',
-                state: elem.state,
-                code: elem.code,
-                email: elem.email,
-                name: elem.name,
-                content: elem.content,
                 changeHistory: elem.changeHistory || false,
             }));
+
+            return ret;
         },
         filtered() {
             return this.submitted.filter(
@@ -243,7 +249,7 @@ export default {
                 REGISTERED: {
                     addresses: ['wp@nort.ee'],
                     template:
-                        'Tere!\n\nSuur tänu! Olete koolitusele registreeritud.\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
+                        'Tere!\n\nSuur tänu! Olete koolitusele registreeritud.\n<<note>>\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
                 },
                 WAIT4CONF: {
                     addresses: ['wp@nort.ee'],

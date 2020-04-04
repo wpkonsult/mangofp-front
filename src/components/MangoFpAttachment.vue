@@ -61,12 +61,16 @@ export default {
                 );
             };
             axios
-                .post(MANGOFP_RESOURCES['adminUrl'] + '/attachments', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
+                .post(
+                    MANGOFP_RESOURCES['adminUrl'] + '/attachments',
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                        onUploadProgress,
                     },
-                    onUploadProgress,
-                })
+                )
                 .then(result => {
                     this.uploadPercentage = 0;
                     this.$emit('attachmentsReceived', result.data.payload);

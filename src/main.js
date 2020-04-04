@@ -7,7 +7,7 @@ import locStr from './plugins/locStr';
 Vue.config.productionTip = false;
 export const bus = new Vue();
 
-Vue.use(locStr);
+Vue.use(locStr); //add this to your main.js file
 
 new Vue({
     store,

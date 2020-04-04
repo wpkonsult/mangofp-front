@@ -104,7 +104,7 @@ export default {
             this.actionObj = { value: '', text: '' };
         },
         actionSelected(value) {
-            const shortcodes = ['name', 'label', 'email'];
+            const shortcodes = ['name', 'label', 'email', 'note'];
             let content = '';
             if (value in this.emailTemplates) {
                 content = this.emailTemplates[value].template;
