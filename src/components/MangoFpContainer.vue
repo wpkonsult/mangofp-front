@@ -1,47 +1,40 @@
 <template>
-    <v-app>
-        <v-sheet v-if="loaded" class="pa-md-4">
-            <v-select
-                :items="labels"
-                v-model="labelFilter"
-                label="Filter"
-                outlined
-            >
-            </v-select>
-            <v-tabs @change="tabChanged">
-                <v-tab v-for="status in statuses" :key="status.order">
-                    {{ status.state }}
-                </v-tab>
-                <v-tab-item v-for="status in statuses" :key="status.code">
-                    <h2>{{ status.state }}</h2>
-                    <v-row align="stretch">
-                        <v-col :cols="listWidth">
-                            <MangoFpListPane
-                                value="0"
-                                :submitted="filtered"
-                                :selectedItem="selectedItem"
-                                :labelsData="labelsData"
-                                @row-selected="rowSelected"
-                            />
-                        </v-col>
-                        <v-col v-if="selectedItem" cols="6">
-                            <MangoFpDetailPane
-                                :selectedItem="selectedItem"
-                                :submitted="submitted"
-                                :labelsData="labelsData"
-                                :selectedTab="selectedTab"
-                                :statuses="statuses"
-                                :emailTemplates="emailTemplates"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-tab-item>
-            </v-tabs>
-        </v-sheet>
-        <v-sheet v-else class="pa-md-4">
-            <p>Loading ...</p>
-        </v-sheet>
-    </v-app>
+    <v-sheet v-if="loaded" class="pa-md-4">
+        <v-select :items="labels" v-model="labelFilter" label="Filter" outlined>
+        </v-select>
+        <v-tabs @change="tabChanged">
+            <v-tab v-for="status in statuses" :key="status.order">
+                {{ status.state }}
+            </v-tab>
+            <v-tab-item v-for="status in statuses" :key="status.code">
+                <h2>{{ status.state }}</h2>
+                <v-row align="stretch">
+                    <v-col :cols="listWidth">
+                        <MangoFpListPane
+                            value="0"
+                            :submitted="filtered"
+                            :selectedItem="selectedItem"
+                            :labelsData="labelsData"
+                            @row-selected="rowSelected"
+                        />
+                    </v-col>
+                    <v-col v-if="selectedItem" cols="6">
+                        <MangoFpDetailPane
+                            :selectedItem="selectedItem"
+                            :submitted="submitted"
+                            :labelsData="labelsData"
+                            :selectedTab="selectedTab"
+                            :statuses="statuses"
+                            :emailTemplates="emailTemplates"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tab-item>
+        </v-tabs>
+    </v-sheet>
+    <v-sheet v-else class="pa-md-4">
+        <p>Loading ...</p>
+    </v-sheet>
 </template>
 
 <script>
