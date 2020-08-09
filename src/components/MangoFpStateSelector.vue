@@ -137,7 +137,7 @@ export default {
                 emailContent: this.emailContent,
                 emailSubject: this.emailSubject,
                 addresses: this.addresses,
-                emailAttachments: this.attachments.map(rec => rec.server_path),
+                emailAttachments: this.attachments.map(rec => rec.id),
             });
         },
         confirm() {

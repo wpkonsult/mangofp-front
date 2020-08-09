@@ -1,11 +1,16 @@
 <template>
     <v-sheet v-if="loaded" class="pa-md-4">
-        <v-select :items="labels" v-model="labelFilter" label="Filter" outlined>
-        </v-select>
+        <h2>Test v.0.0.4</h2>
+        <v-select
+            :items="labels"
+            v-model="labelFilter"
+            label="Filter"
+            outlined
+        ></v-select>
         <v-tabs @change="tabChanged">
-            <v-tab v-for="status in statuses" :key="status.order">
-                {{ status.state }}
-            </v-tab>
+            <v-tab v-for="status in statuses" :key="status.order">{{
+                status.state
+            }}</v-tab>
             <v-tab-item v-for="status in statuses" :key="status.code">
                 <h2>{{ status.state }}</h2>
                 <v-row align="stretch">

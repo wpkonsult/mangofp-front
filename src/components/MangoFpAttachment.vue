@@ -47,6 +47,7 @@ export default {
         },
         submitFile() {
             let formData = new FormData();
+            this.$emit('submittingAttachments');
             for (var i = 0; i < this.files.length; i++) {
                 let file = this.files[i];
 
@@ -81,6 +82,7 @@ export default {
                         error: e.message || 'Uploading attachments failed',
                     });
                     this.uploadPercentage = 0;
+                    this.$emit('submittingAttachmentsFinished');
                 });
         },
     },

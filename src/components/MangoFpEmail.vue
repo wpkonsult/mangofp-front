@@ -22,11 +22,16 @@
                             color="blue darken-1"
                             outlined
                             @click.native="send"
+                            :disabled="disabledWhileActionInProgress"
                         >
                             {{ $locStr('Send') }}
                         </v-btn>
                         <MangoFpAttachment
                             @attachmentsReceived="addAttachments"
+                            @submittingAttachments="submittingAttachments"
+                            @submittingAttachmentsFinished="
+                                submittingAttachmentsFinished
+                            "
                         />
                     </v-card-actions>
                     <v-chip
@@ -72,6 +77,7 @@ export default {
             emailContent: '',
             emailSubject: '',
             attachments: [],
+            disabledWhileActionInProgress: false,
         };
     },
     computed: {
@@ -90,11 +96,18 @@ export default {
                 emailContent: this.emailContent,
                 emailSubject: this.emailSubject,
                 addresses: this.addresses,
-                emailAttachments: this.attachments.map(rec => rec.server_path),
+                emailAttachments: this.attachments.map(rec => rec.id),
             });
         },
         addAttachments(files) {
             this.attachments = [...this.attachments, ...files];
+            this.disabledWhileActionInProgress = false;
+        },
+        submittingAttachments() {
+            this.disabledWhileActionInProgress = true;
+        },
+        submittingAttachmentsFinished() {
+            this.disabledWhileActionInProgress = false;
         },
         removeAttachment(attachmentId) {
             this.attachments = this.attachments.filter(
