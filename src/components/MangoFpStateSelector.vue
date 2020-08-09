@@ -32,6 +32,7 @@
                             color="blue darken-1"
                             outlined
                             @click.native="confirm"
+                            :disabled="disabledWhileActionInProgress"
                         >
                             {{ $locStr('Confirm') }}
                         </v-btn>
@@ -39,11 +40,16 @@
                             color="blue darken-1"
                             outlined
                             @click.native="confirmAndSend"
+                            :disabled="disabledWhileActionInProgress"
                         >
                             {{ $locStr('Confirm and send') }}
                         </v-btn>
                         <MangoFpAttachment
                             @attachmentsReceived="addAttachments"
+                            @submittingAttachments="submittingAttachments"
+                            @submittingAttachmentsFinished="
+                                submittingAttachmentsFinished
+                            "
                         />
                     </v-card-actions>
                     <v-chip
@@ -93,6 +99,7 @@ export default {
             actionName: '',
             actionObj: { value: '', text: '' },
             attachments: [],
+            disabledWhileActionInProgress: false,
         };
     },
     methods: {
@@ -149,6 +156,13 @@ export default {
         },
         addAttachments(files) {
             this.attachments = [...this.attachments, ...files];
+            this.disabledWhileActionInProgress = false;
+        },
+        submittingAttachments() {
+            this.disabledWhileActionInProgress = true;
+        },
+        submittingAttachmentsFinished() {
+            this.disabledWhileActionInProgress = false;
         },
         removeAttachment(attachmentId) {
             this.attachments = this.attachments.filter(
