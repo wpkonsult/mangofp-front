@@ -1,6 +1,6 @@
 <template>
     <v-sheet v-if="loaded" class="pa-md-4">
-        <h2>Test v.0.0.4</h2>
+        <h2>{{ appVersion }}</h2>
         <v-select
             :items="labels"
             v-model="labelFilter"
@@ -195,6 +195,18 @@ export default {
         },
     },
     computed: {
+        appVersion() {
+            if (!window.MANGOFP_RESOURCES.version) {
+                return 'NA';
+            }
+            let version = [];
+            for (const [key, value] of Object.entries(
+                window.MANGOFP_RESOURCES.version,
+            )) {
+                version.push(key + ' - ' + value);
+            }
+            return 'MangoFp version: ' + version.join(', ') || 'older';
+        },
         submitted() {
             const labelsObj = {};
             this.labelsData.forEach(elem => {
