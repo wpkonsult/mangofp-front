@@ -53,36 +53,45 @@ async function fetchLabels() {
 }
 
 function __makeMessage(element) {
-    const states = getStates();
-    const data = {
-        id: element.id,
-        form: element.form,
-        labelId: element.labelId,
-        code: element.code,
-        state: element.code in states ? states[element.code].state : '??',
-        email: element.email,
-        name: element.name,
-        note: element.note,
-        lastUpdated: element.lastUpdated,
-        content: Object.entries(JSON.parse(element.content)),
-    };
+    try {
+        const states = getStates();
+        const data = {
+            id: element.id,
+            form: element.form,
+            labelId: element.labelId,
+            code: element.code,
+            state: element.code in states ? states[element.code].state : '??',
+            email: element.email,
+            name: element.name,
+            note: element.note,
+            lastUpdated: element.lastUpdated,
+            content: Object.entries(JSON.parse(element.content)),
+        };
 
-    if ('changeHistory' in element) {
-        data.changeHistory = element.changeHistory;
+        if ('changeHistory' in element) {
+            data.changeHistory = element.changeHistory;
+        }
+        return data;
+    } catch (e) {
+        console.log('Unable to parse:');
+        console.log(element);
+        return false;
     }
-
-    return data;
 }
 
 async function fetchMessages() {
     const data = await __makeGetRequest('/messages');
+    console.log('Start creating messages');
 
     if (!('messages' in data) || !Array.isArray(data.messages)) {
         throw new Error('No messages found in response');
     }
     const messages = [];
     data.messages.forEach(element => {
-        messages.push(__makeMessage(element));
+        const createdMessage = __makeMessage(element);
+        if (createdMessage) {
+            messages.push(createdMessage);
+        }
     });
     return messages;
 }
