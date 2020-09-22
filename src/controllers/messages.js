@@ -73,15 +73,12 @@ function __makeMessage(element) {
         }
         return data;
     } catch (e) {
-        console.log('Unable to parse:');
-        console.log(element);
         return false;
     }
 }
 
 async function fetchMessages() {
     const data = await __makeGetRequest('/messages');
-    console.log('Start creating messages');
 
     if (!('messages' in data) || !Array.isArray(data.messages)) {
         throw new Error('No messages found in response');
