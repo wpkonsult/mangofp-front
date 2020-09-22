@@ -1,23 +1,19 @@
 <template>
     <v-app>
         <v-content>
-            <HelloWorld />
+            <MangoFpContainer />
         </v-content>
     </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import MangoFpContainer from './components/MangoFpContainer';
 
 export default {
     name: 'App',
 
     components: {
-        HelloWorld,
+        MangoFpContainer,
     },
-
-    data: () => ({
-        //
-    }),
 };
 </script>

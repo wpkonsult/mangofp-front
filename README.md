@@ -1,4 +1,4 @@
-# peaches-front
+# mangofp-front
 
 ## Project setup
 ```
