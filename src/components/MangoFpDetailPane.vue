@@ -2,25 +2,14 @@
     <v-flex xs12 sm12>
         <v-tabs vertical>
             <v-tab>
-                <v-icon left>mdi-history</v-icon>
+                <v-icon left>mdi-border-color</v-icon>
             </v-tab>
             <v-tab>
-                <v-icon left>mdi-border-color</v-icon>
+                <v-icon left>mdi-history</v-icon>
             </v-tab>
             <v-tab>
                 <v-icon left>mdi-email-outline</v-icon>
             </v-tab>
-            <v-tab-item transition="fade-transition" reverse-transition="false">
-                <MangoFpStateSelector
-                    :selectedTab="selectedTab"
-                    :statuses="statuses"
-                    :contactDetails="details"
-                    :emailTemplates="emailTemplates"
-                    :details="details"
-                />
-                <MangoFpEmailHistory :history="details.changeHistory || []">
-                </MangoFpEmailHistory>
-            </v-tab-item>
             <v-tab-item transition="fade-transition" reverse-transition="false">
                 <v-sheet v-if="selectedItem">
                     {{ $locStr('Change') }}
@@ -37,13 +26,26 @@
                         :label="$locStr('Email')"
                         @change="emailChanged"
                     ></v-text-field>
-                    <v-text-field
+                    <v-textarea
+                        filled
                         class="detailField"
+                        :rows="rowsForNote"
                         v-model="details.note"
                         :label="$locStr('Note')"
                         @change="noteChanged"
-                    ></v-text-field>
+                    ></v-textarea>
                 </v-sheet>
+            </v-tab-item>
+            <v-tab-item transition="fade-transition" reverse-transition="false">
+                <MangoFpStateSelector
+                    :selectedTab="selectedTab"
+                    :statuses="statuses"
+                    :contactDetails="details"
+                    :emailTemplates="emailTemplates"
+                    :details="details"
+                />
+                <MangoFpEmailHistory :history="details.changeHistory || []">
+                </MangoFpEmailHistory>
             </v-tab-item>
             <v-tab-item transition="fade-transition" reverse-transition="false">
                 <MangoFpEmail
@@ -135,6 +137,21 @@ export default {
             }
 
             return emptyData;
+        },
+        rowsForNote() {
+            if (!this.selectedItem) {
+                return 1;
+            }
+
+            let maxRows = 30;
+
+            let minRows = 5;
+            const data = this.submitted.find(s => s.id === this.selectedItem);
+            if (!data.note) {
+                return minRows;
+            }
+            let rows = parseInt(data.note.length / 45);
+            return minRows > rows ? minRows : maxRows < rows ? maxRows : rows;
         },
         selectedLabel: {
             get() {

@@ -10,7 +10,7 @@
                         :class="{ selectedLine: selectedItem === item.id }"
                     >
                         <td>{{ item.label }}</td>
-                        <td>{{ item.note }}</td>
+                        <td>{{ item.note.substr(0, 200) }}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.email }}</td>
                         <td>{{ item.lastUpdated }}</td>
