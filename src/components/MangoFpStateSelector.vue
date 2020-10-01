@@ -240,30 +240,5 @@ export default {
 </script>
 
 <style>
-.email-header {
-    padding-left: 3px;
-}
-
-.email-header input {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: black;
-    margin-bottom: 1px;
-    line-height: 20px;
-    padding: 3px;
-    width: 100%;
-}
-
-.email-header:focus-within {
-    color: #1976d2;
-}
-
-.email-header input:focus {
-    color: black;
-    outline-style: none;
-    border-bottom-width: 2px;
-    margin-bottom: 0px;
-    border-bottom-style: solid;
-    border-bottom-color: #1976d2;
-}
+@import '../assets/css/mangofp.css';
 </style>

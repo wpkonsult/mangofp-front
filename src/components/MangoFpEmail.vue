@@ -6,9 +6,17 @@
                     <v-card-title>
                         Send email
                     </v-card-title>
+                    <v-card-subtitle>
+                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
+                        <label class="email-header">
+                            {{ $locStr('Subject') }}
+                            <input
+                                v-model="emailSubject"
+                            />
+                        </label>
+                    </v-card-subtitle>
                     <v-divider></v-divider>
                     <v-card-text style="height: 300px;">
-                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
                         <v-textarea
                             name="email-text"
                             no-resize
@@ -88,7 +96,7 @@ export default {
     methods: {
         clear() {
             this.emailContent = 'no content';
-            this.emailSubject = 'dummy';
+            this.emailSubject = '';
         },
         send() {
             bus.$emit('EventSendEmail', {
@@ -155,4 +163,6 @@ export default {
     },
 };
 </script>
-<style></style>
+<style>
+@import '../assets/css/mangofp.css';
+</style>
