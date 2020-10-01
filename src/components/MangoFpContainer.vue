@@ -286,6 +286,11 @@ export default {
                     template:
                         'Tere!\n\nOotame Teid esmaspäeval, 06. novembril kell 10.00, Exceli täiendkoolituse esimesele päevale.\n\nKoolitus toimub NORT Koolituse arvutiklassis, Vaksali 17a, ruum 407, Tartu (sissepääs Vaksali tänavalt, lillepoe ja kohvikuga samast uksest, liftiga 4.korrusele, asume otse lifti vastas.)\n\nPanin kaasa ka koolitusarve. Kui midagi oleks selles vaja muuta, siis andke palun teada.\n\nParkimine -  tänava ääres kellaga 90 min tasuta ja alates kella 18.00-st tasuta. Raudtee äärses parklas ja Tiigi tn äärses parklas on kogu aeg tasuta. Lähim linnaliini peatus on „Vaksali“.\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
                 },
+                FBASKED: {
+                    addresses: ['wp@nort.ee'],
+                    template:
+                        'Tere!\n\nSuur tänu koolitusel "<<label>>" osalemise eest.\nPaluksin nüüd Teilt sellele väikest tagasisidet. Mis hästi, mis halvasti, kas koolitusest oli reaalset kasu jms.\n\nTagasiside  küsimustiku leiate aadressilt https://nort.ee\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
+                },
                 NEWSLETTER: {
                     addresses: ['wp@nort.ee'],
                     template:

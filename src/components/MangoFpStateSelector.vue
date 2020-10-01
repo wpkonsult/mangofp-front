@@ -16,13 +16,22 @@
                     <v-card-title>
                         {{ actionName }}
                     </v-card-title>
+                    <v-card-subtitle>
+                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
+                        <label class="email-header">
+                            {{ $locStr('Subject') }}
+                            <input
+                                :placeholder="$locStr('Subject')"
+                                v-model="emailSubject"
+                            />
+                        </label>
+                    </v-card-subtitle>
                     <v-divider></v-divider>
                     <v-card-text style="height: 300px;">
-                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
                         <v-textarea
                             name="email-text"
                             no-resize
-                            rows="8"
+                            rows="10"
                             dense
                             v-model="emailContent"
                         ></v-textarea>
@@ -230,4 +239,31 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.email-header {
+    padding-left: 3px;
+}
+
+.email-header input {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: black;
+    margin-bottom: 1px;
+    line-height: 20px;
+    padding: 3px;
+    width: 100%;
+}
+
+.email-header:focus-within {
+    color: #1976d2;
+}
+
+.email-header input:focus {
+    color: black;
+    outline-style: none;
+    border-bottom-width: 2px;
+    margin-bottom: 0px;
+    border-bottom-style: solid;
+    border-bottom-color: #1976d2;
+}
+</style>
