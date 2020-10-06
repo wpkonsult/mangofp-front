@@ -131,6 +131,7 @@ async function updateMessage(payload, bus) {
             code: payload.message.code,
             email: payload.message.email,
             labelId: payload.message.labelId,
+            name: payload.message.name,
             note: payload.message.note,
         },
         email: false,

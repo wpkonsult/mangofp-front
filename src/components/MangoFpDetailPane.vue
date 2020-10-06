@@ -22,6 +22,12 @@
                     </v-select>
                     <v-text-field
                         class="detailField"
+                        v-model="details.name"
+                        :label="$locStr('Name')"
+                        @change="nameChanged"
+                    ></v-text-field>
+                    <v-text-field
+                        class="detailField"
                         v-model="details.email"
                         :label="$locStr('Email')"
                         @change="emailChanged"
@@ -83,6 +89,11 @@ export default {
         emailChanged(value) {
             bus.$emit('EventEmailLabelChanged', {
                 message: { ...this.details, email: value },
+            });
+        },
+        nameChanged(value) {
+            bus.$emit('EventNameLabelChanged', {
+                message: { ...this.details, name: value },
             });
         },
         noteChanged(value) {

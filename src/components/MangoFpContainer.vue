@@ -120,6 +120,17 @@ export default {
                     bus,
                 );
             });
+            bus.$on('EventNameLabelChanged', payload => {
+                updateMessage(
+                    {
+                        message: {
+                            id: payload.message.id,
+                            name: payload.message.name,
+                        },
+                    },
+                    bus,
+                );
+            });
             bus.$on('EventNoteChanged', payload => {
                 updateMessage(
                     {

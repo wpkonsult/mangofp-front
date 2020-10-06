@@ -10,9 +10,7 @@
                         <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
                         <label class="email-header">
                             {{ $locStr('Subject') }}
-                            <input
-                                v-model="emailSubject"
-                            />
+                            <input v-model="emailSubject" />
                         </label>
                     </v-card-subtitle>
                     <v-divider></v-divider>
