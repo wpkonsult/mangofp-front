@@ -13,17 +13,19 @@ cp -v ./dist/css/app.*.css ../mangofp/stage/assets/css/app.css
 echo 'Build completed, will stage generated assets for settings...'
 
 CURRENTDIR=$(pwd)
-cd ../mangofp-settings
+cd ../mangofp-settings-ts
 npm run build
 cd $CURRENTDIR
 
 mkdir -p ../mangofp/stage/assets/settings/js
 mkdir -p ../mangofp/stage/assets/settings/css
 
-cp -v ../mangofp-settings/dist/js/chunk-vendors.*.js ../mangofp/stage/assets/settings/js/chunk-vendors.js
-cp -v ../mangofp-settings/dist/js/app.*.js ../mangofp/stage/assets/settings/js/app.js
-cp -v ../mangofp-settings/dist/css/chunk-vendors.*.css ../mangofp/stage/assets/settings/css/chunk-vendors.css
-cp -v ../mangofp-settings/dist/css/app.*.css ../mangofp/stage/assets/settings/css/app.css
+cp -v ../mangofp-settings-ts/dist/js/chunk-vendors.*.js ../mangofp/stage/assets/settings/js/chunk-vendors.js
+cp -v ../mangofp-settings-ts/dist/js/chunk-vendors.*.js.map ../mangofp/stage/assets/settings/js/.
+cp -v ../mangofp-settings-ts/dist/js/app.*.js ../mangofp/stage/assets/settings/js/app.js
+cp -v ../mangofp-settings-ts/dist/js/app.*.js.map ../mangofp/stage/assets/settings/js/.
+cp -v ../mangofp-settings-ts/dist/css/chunk-vendors.*.css ../mangofp/stage/assets/settings/css/chunk-vendors.css
+cp -v ../mangofp-settings-ts/dist/css/app.*.css ../mangofp/stage/assets/settings/css/app.css
 echo 'Staging '
 echo 'Staging backend'
 ../mangofp/generate_autoload.sh
