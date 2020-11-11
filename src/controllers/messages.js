@@ -1,44 +1,8 @@
-/*globals MANGOFP_RESOURCES:false */
-import axios from 'axios';
-
-const ROOT_URL = MANGOFP_RESOURCES['adminUrl'];
-
-async function __makeGetRequest(endpoint) {
-    const res = await axios.get(ROOT_URL + endpoint);
-    if (!res || res.status !== 200) {
-        throw new Error('Unable to read data from ' + endpoint);
-    }
-
-    if (
-        !('status' in res.data) ||
-        res.data.status !== 'RESULT_SUCCESS' ||
-        !('payload' in res.data)
-    ) {
-        throw new Error('Could not read response status');
-    }
-
-    return res.data.payload;
-}
-
-async function __makePostRequest(endpoint, payload) {
-    const res = await axios.post(ROOT_URL + endpoint, payload);
-    if (!res || res.status !== 200) {
-        throw new Error('Error received from request. Details: ' + endpoint);
-    }
-
-    if (
-        !('status' in res.data) ||
-        res.data.status !== 'RESULT_SUCCESS' ||
-        !('payload' in res.data)
-    ) {
-        throw new Error('Could not read response status');
-    }
-
-    return res.data.payload;
-}
+import { dataStore } from '../main';
+import { makeGetRequest, makePostRequest } from './common';
 
 async function fetchLabels() {
-    const data = await __makeGetRequest('/labels');
+    const data = await makeGetRequest('/labels');
 
     if (!('labels' in data) || !Array.isArray(data.labels)) {
         throw new Error('No labels found in response');
@@ -54,7 +18,7 @@ async function fetchLabels() {
 
 function __makeMessage(element) {
     try {
-        const states = getStates();
+        const states = dataStore.getSteps();
         const data = {
             id: element.id,
             form: element.form,
@@ -77,14 +41,19 @@ function __makeMessage(element) {
     }
 }
 
-async function fetchMessages() {
-    const data = await __makeGetRequest('/messages');
+async function fetchMessagesData() {
+    const data = await makeGetRequest('/messages');
 
     if (!('messages' in data) || !Array.isArray(data.messages)) {
         throw new Error('No messages found in response');
     }
+
+    return data.messages;
+}
+
+function setMessages(messagesData) {
     const messages = [];
-    data.messages.forEach(element => {
+    messagesData.forEach(element => {
         const createdMessage = __makeMessage(element);
         if (createdMessage) {
             messages.push(createdMessage);
@@ -107,7 +76,7 @@ async function sendEmail(payload, bus) {
         },
     };
 
-    const result = await __makePostRequest(
+    const result = await makePostRequest(
         '/messages/' + data.id + '/emails',
         data,
     ).catch(error => {
@@ -145,7 +114,7 @@ async function updateMessage(payload, bus) {
         };
     }
 
-    const result = await __makePostRequest('/messages/' + data.id, data).catch(
+    const result = await makePostRequest('/messages/' + data.id, data).catch(
         error => {
             bus.$emit('ErrorConnection', {
                 error: error.message || 'Unidentified connection error',
@@ -165,7 +134,7 @@ async function getMessage(id, bus) {
         bus.emit('ErrorConnection', { error: 'no id for get request' });
     }
 
-    const result = await __makeGetRequest('/messages/' + id).catch(error => {
+    const result = await makeGetRequest('/messages/' + id).catch(error => {
         bus.$emit('ErrorConnection', {
             error: error.message || 'Unidentified connection error',
         });
@@ -268,11 +237,27 @@ function getStates() {
     };
 }
 
+async function fetchStepsDataToStore() {
+    const stepsData = await makeGetRequest('/steps');
+    if (!('steps' in stepsData)) {
+        throw new Error('No steps found in response');
+    }
+
+    dataStore.resetSteps();
+    for (const [key, step] of Object.entries(stepsData.steps)) {
+        dataStore.setStep(key, step);
+    }
+
+    return true;
+}
+
 export {
     fetchLabels,
-    fetchMessages,
+    fetchMessagesData,
+    setMessages,
     updateMessage,
     getStates,
+    fetchStepsDataToStore,
     getMessage,
     sendEmail,
 };

@@ -47,9 +47,11 @@ import MangoFpListPane from './MangoFpListPane';
 import MangoFpDetailPane from './MangoFpDetailPane';
 import {
     fetchLabels,
-    fetchMessages,
+    fetchMessagesData,
+    setMessages,
     updateMessage,
     getStates,
+    fetchStepsDataToStore,
     getMessage,
     sendEmail,
 } from './../controllers/messages';
@@ -64,13 +66,20 @@ export default {
     async mounted() {
         this.subscribe();
         this.statuses = Object.values(this.stateData);
+        let messagesData;
+        let stepsLoaded;
         try {
-            [this.labelsData, this.submittedData] = await Promise.all([
+            [this.labelsData, messagesData, stepsLoaded] = await Promise.all([
                 fetchLabels(),
-                fetchMessages(),
+                fetchMessagesData(),
+                fetchStepsDataToStore(),
             ]);
-            this.loaded = true;
+            if (stepsLoaded) {
+                this.messagesData = setMessages(messagesData);
+                this.loaded = true;
+            }
         } catch (e) {
+            console.log('Error: ' + e.message);
             this.error = e.message;
         }
     },
@@ -194,13 +203,13 @@ export default {
                 this.error = payload.error;
             });
             bus.$on('DataMessageUpdated', message => {
-                const updateIndex = this.submittedData.findIndex(
+                const updateIndex = this.messagesData.findIndex(
                     el => el.id === message.id,
                 );
                 if (updateIndex < 0) {
-                    this.submittedData.push(message);
+                    this.messagesData.push(message);
                 } else {
-                    this.submittedData.splice(updateIndex, 1, message);
+                    this.messagesData.splice(updateIndex, 1, message);
                 }
             });
         },
@@ -224,7 +233,7 @@ export default {
                 labelsObj[elem.id] = elem.name;
             });
 
-            const ret = this.submittedData.map(elem => ({
+            const ret = this.messagesData.map(elem => ({
                 ...elem,
                 label: labelsObj[elem.labelId] || '',
                 changeHistory: elem.changeHistory || false,
@@ -265,7 +274,7 @@ export default {
             statuses: [],
             stateData: getStates(),
             labelsData: [],
-            submittedData: [],
+            messagesData: [],
             emailTemplates: {
                 REGISTERED: {
                     addresses: ['wp@nort.ee'],
