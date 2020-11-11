@@ -147,96 +147,6 @@ async function getMessage(id, bus) {
     return result;
 }
 
-function getStates() {
-    return {
-        NEW: {
-            order: 1,
-            code: 'NEW',
-            state: 'Uus',
-            action: 'Määra uueks',
-            next: [
-                'REGISTERED',
-                'WAIT4CONF',
-                'WAIT4NEW',
-                'WAIT4ACCEPT',
-                'CANCELLED',
-                'NEWSLETTER',
-                'ARCHIVED',
-            ],
-        },
-        REGISTERED: {
-            order: 2,
-            code: 'REGISTERED',
-            state: 'Registreeritud',
-            action: 'Registreeri',
-            next: ['NOTIFIED', 'ARCHIVED', 'CANCELLED'],
-        },
-        WAIT4CONF: {
-            order: 3,
-            code: 'WAIT4CONF',
-            state: 'TTA kaudu',
-            action: 'TTA kaudu',
-            next: ['CONFRECEIVED', 'CANCELLED'],
-        },
-        CONFRECEIVED: {
-            order: 4,
-            code: 'CONFRECEIVED',
-            state: 'TTA kinnitanud',
-            action: 'TTA kinnitanud',
-            next: ['REGISTERED', 'NOTIFIED', 'CANCELLED'],
-        },
-        WAIT4NEW: {
-            order: 5,
-            code: 'WAIT4NEW',
-            state: 'Ooteleht',
-            action: 'Ooteleht',
-            next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
-        },
-        WAIT4ACCEPT: {
-            order: 6,
-            code: 'WAIT4ACCEPT',
-            state: 'Aeg pakutud',
-            action: 'Paku uus aeg',
-            next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
-        },
-        NOTIFIED: {
-            order: 7,
-            code: 'NOTIFIED',
-            state: 'Teade saadetud',
-            action: 'Saada meeldetuletus',
-            next: ['FBASKED', 'ARCHIVED'],
-        },
-        FBASKED: {
-            order: 8,
-            code: 'FBASKED',
-            state: 'Tagasiside küsitud',
-            action: 'Küsi tagasiside',
-            next: ['ARCHIVED'],
-        },
-        NEWSLETTER: {
-            order: 9,
-            code: 'NEWSLETTER',
-            state: 'Uudiskiri',
-            action: 'Uudiskiri',
-            next: ['ARCHIVED'],
-        },
-        ARCHIVED: {
-            order: 10,
-            code: 'ARCHIVED',
-            state: 'Arhiveeritud',
-            action: 'Arhiveeri',
-            next: [],
-        },
-        CANCELLED: {
-            order: 11,
-            code: 'CANCELLED',
-            state: 'Katkestatud',
-            action: 'Katkesta',
-            next: ['ARCHIVED'],
-        },
-    };
-}
-
 async function fetchStepsDataToStore() {
     const stepsData = await makeGetRequest('/steps');
     if (!('steps' in stepsData)) {
@@ -256,7 +166,6 @@ export {
     fetchMessagesData,
     setMessages,
     updateMessage,
-    getStates,
     fetchStepsDataToStore,
     getMessage,
     sendEmail,

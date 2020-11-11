@@ -50,12 +50,11 @@ import {
     fetchMessagesData,
     setMessages,
     updateMessage,
-    getStates,
     fetchStepsDataToStore,
     getMessage,
     sendEmail,
 } from './../controllers/messages';
-import { bus } from '../main';
+import { bus, dataStore } from '../main';
 
 export default {
     name: 'MangoFpContainer',
@@ -65,7 +64,6 @@ export default {
     },
     async mounted() {
         this.subscribe();
-        this.statuses = Object.values(this.stateData);
         let messagesData;
         let stepsLoaded;
         try {
@@ -76,6 +74,7 @@ export default {
             ]);
             if (stepsLoaded) {
                 this.messagesData = setMessages(messagesData);
+                this.statuses = Object.values(dataStore.getSteps());
                 this.loaded = true;
             }
         } catch (e) {
@@ -272,7 +271,7 @@ export default {
             labelFilter: '000',
             selectedTab: 1,
             statuses: [],
-            stateData: getStates(),
+            stateData: [],
             labelsData: [],
             messagesData: [],
             emailTemplates: {
