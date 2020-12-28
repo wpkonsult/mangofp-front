@@ -1,6 +1,6 @@
 <template>
     <v-flex xs12 sm12>
-        <v-tabs vertical>
+        <v-tabs v-if="globalState.templateLoaded" vertical>
             <v-tab>
                 <v-icon left>mdi-border-color</v-icon>
             </v-tab>
@@ -71,7 +71,8 @@
 import MangoFpStateSelector from './MangoFpStateSelector';
 import MangoFpEmailHistory from './MangoFpEmailHistory';
 import MangoFpEmail from './MangoFpEmail';
-import { bus } from '../main';
+import { bus, dataStore } from '../main';
+import { fetchTemplates } from '../controllers/messages';
 
 export default {
     name: 'MangoFpDetailPane',
@@ -185,6 +186,9 @@ export default {
                 text: item.name,
             }));
         },
+        emailTemplates() {
+            return this.globalState.emailTemplates;
+        },
     },
     props: {
         selectedItem: {
@@ -207,10 +211,14 @@ export default {
             type: Array,
             required: true,
         },
-        emailTemplates: {
-            type: Object,
-            required: false,
-        },
+    },
+    data() {
+        return {
+            globalState: dataStore,
+        };
+    },
+    async mounted() {
+        fetchTemplates();
     },
 };
 </script>

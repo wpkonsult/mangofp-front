@@ -1,6 +1,22 @@
 export default class DataStore {
     constructor() {
         this.steps = false;
+        this.emailTemplates = {};
+        this.templateLoaded = false;
+    }
+
+    setTemplate(
+        stepCode,
+        data = { addresses: [], ccAddresses: [], template: '' },
+    ) {
+        const { addresses = [], ccAddresses = [], template = '' } = data;
+        this.emailTemplates = Object.assign({}, this.emailTemplates, {
+            [stepCode]: { addresses, ccAddresses, template },
+        });
+    }
+
+    setTemplatesLoaded(loaded = true) {
+        this.templateLoaded = loaded;
     }
 
     setStep(code, stepObj) {

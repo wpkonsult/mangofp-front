@@ -161,6 +161,24 @@ async function fetchStepsDataToStore() {
     return true;
 }
 
+async function fetchTemplates() {
+    const templatesData = await makeGetRequest('/templates');
+    if (templatesData && 'templates' in templatesData) {
+        for (const code in templatesData.templates) {
+            const data = templatesData.templates[code];
+            if (data && 'template' in data) {
+                dataStore.setTemplate(code, {
+                    addresses: data.addresses,
+                    ccAddresses: data.mainAddresses,
+                    template: data.template,
+                });
+            }
+        }
+    }
+    dataStore.setTemplatesLoaded(true);
+    return true;
+}
+
 export {
     fetchLabels,
     fetchMessagesData,
@@ -169,4 +187,5 @@ export {
     fetchStepsDataToStore,
     getMessage,
     sendEmail,
+    fetchTemplates,
 };
