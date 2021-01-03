@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container pt-2">
         <div class="large-12 medium-12 small-12 cell">
             <input
                 if

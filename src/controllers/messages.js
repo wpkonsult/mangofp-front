@@ -71,6 +71,7 @@ async function sendEmail(payload, bus) {
         email: {
             content: payload.message.emailContent,
             addresses: payload.message.addresses,
+            ccAddresses: payload.message.ccAddresses,
             subject: payload.message.emailSubject || '',
             attachments: payload.message.emailAttachments,
         },
@@ -109,6 +110,7 @@ async function updateMessage(payload, bus) {
         data.email = {
             content: payload.message.emailContent,
             addresses: payload.message.addresses,
+            ccAddresses: payload.message.ccAddresses || [],
             subject: payload.message.emailSubject || '',
             attachments: payload.message.emailAttachments,
         };
@@ -168,8 +170,8 @@ async function fetchTemplates() {
             const data = templatesData.templates[code];
             if (data && 'template' in data) {
                 dataStore.setTemplate(code, {
-                    addresses: data.addresses,
-                    ccAddresses: data.mainAddresses,
+                    addresses: data.mainAddresses,
+                    ccAddresses: data.addresses,
                     template: data.template,
                 });
             }
