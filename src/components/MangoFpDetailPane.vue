@@ -56,7 +56,6 @@
             <v-tab-item transition="fade-transition" reverse-transition="false">
                 <MangoFpEmail
                     :selectedTab="selectedTab"
-                    :contactDetails="details"
                     :emailTemplates="emailTemplates"
                     :details="details"
                 />

@@ -10,101 +10,53 @@
             >
             </v-select>
         </v-row>
-        <v-row>
-            <v-col>
-                <v-card v-if="emailContent">
-                    <v-card-title>
-                        {{ actionName }}
-                    </v-card-title>
-                    <v-card-subtitle>
-                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
-                        <label class="email-header">
-                            {{ $locStr('Subject') }}
-                            <input
-                                :placeholder="$locStr('Subject')"
-                                v-model="emailSubject"
-                            />
-                        </label>
-                    </v-card-subtitle>
-                    <v-divider></v-divider>
-                    <v-card-text style="height: 300px;">
-                        <v-textarea
-                            name="email-text"
-                            no-resize
-                            rows="10"
-                            dense
-                            v-model="emailContent"
-                        ></v-textarea>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn
-                            color="blue darken-1"
-                            outlined
-                            @click.native="confirm"
-                            :disabled="disabledWhileActionInProgress"
-                        >
-                            {{ $locStr('Confirm') }}
-                        </v-btn>
-                        <v-btn
-                            color="blue darken-1"
-                            outlined
-                            @click.native="confirmAndSend"
-                            :disabled="disabledWhileActionInProgress"
-                        >
-                            {{ $locStr('Confirm and send') }}
-                        </v-btn>
-                        <MangoFpAttachment
-                            @attachmentsReceived="addAttachments"
-                            @submittingAttachments="submittingAttachments"
-                            @submittingAttachmentsFinished="
-                                submittingAttachmentsFinished
-                            "
-                        />
-                    </v-card-actions>
-                    <v-chip
-                        class="ma-2"
-                        color="primary"
-                        label
-                        close
-                        v-for="attachment in attachments"
-                        :key="attachment.id"
-                        @click:close="removeAttachment(attachment.id)"
-                        @click="downloadAttachment(attachment.url)"
+        <div v-if="emailContent">
+            <MangoFpEmailForm
+                :emailFormName="actionName"
+                :emailContent="emailContent"
+                :emailSubject="emailSubject"
+                :addresses="addresses"
+                :ccaddresses="ccaddresses"
+                :contactEmail="details.email"
+                @sendEmail="confirmAndSend"
+            >
+                <template v-slot:action="actionSlotProps">
+                    <v-btn
+                        color="blue darken-1"
+                        outlined
+                        @click.native="actionSlotProps.confirmAndSend"
+                        :disabled="
+                            actionSlotProps.disabledWhileActionInProgress
+                        "
                     >
-                        {{ attachment.file_name }}
-                    </v-chip>
-                </v-card>
-                <v-card v-else>
-                    <v-card-title>{{ actionName }}</v-card-title>
-                    <v-card-text style="height: 100px;">
-                        <p>
-                            Please confirm, that message will be set to state
-                            "{{ actionName }}"
-                        </p>
-                    </v-card-text>
-                    <v-btn outlined color="success" @click.native="confirm">
-                        {{ $locStr('Confirm') }}
+                        {{ $locStr('Apply') }}
                     </v-btn>
-                </v-card>
-            </v-col>
-        </v-row>
+                </template>
+            </MangoFpEmailForm>
+        </div>
+        <v-btn outlined color="blue darken-1" @click.native="confirm">
+            {{ $locStr('Confirm') }}
+        </v-btn>
     </v-container>
 </template>
 
 <script>
 import { bus } from '../main';
-import MangoFpAttachment from './MangoFpAttachment';
+import MangoFpEmailForm from './MangoFpEmailForm';
+
+//const CONTANT_EMAIL = '[contactEmail]';
 
 export default {
     name: 'MangoFpStateSelector',
     components: {
-        MangoFpAttachment,
+        MangoFpEmailForm,
     },
     data() {
         return {
             emailContent: '',
             emailSubject: '',
             addresses: [],
+            ccaddresses: [],
             actionName: '',
             actionObj: { value: '', text: '' },
             attachments: [],
@@ -115,6 +67,7 @@ export default {
         clear() {
             this.emailContent = '';
             this.addresses = [];
+            this.ccaddresses = [];
             this.actionName = '';
             this.emailSubject = '';
             this.actionObj = { value: '', text: '' };
@@ -124,10 +77,8 @@ export default {
             let content = '';
             if (value in this.emailTemplates) {
                 content = this.emailTemplates[value].template;
-                this.addresses = [
-                    this.details.email,
-                    ...this.emailTemplates[value].addresses,
-                ];
+                this.ccaddresses = [...this.emailTemplates[value].ccAddresses];
+                this.addresses = [...this.emailTemplates[value].addresses];
             }
             shortcodes.forEach(element => {
                 content = content.replace(
@@ -145,15 +96,15 @@ export default {
             this.actionName = foundAction.text;
             this.actionObj = foundAction;
         },
-        confirmAndSend() {
-            this.dialog = false;
+        confirmAndSend(values) {
             bus.$emit('EventSendEmailAndChangeState', {
                 messageId: this.details.id,
                 newState: this.actionObj.value,
-                emailContent: this.emailContent,
-                emailSubject: this.emailSubject,
-                addresses: this.addresses,
-                emailAttachments: this.attachments.map(rec => rec.id),
+                emailContent: values.emailContent,
+                emailSubject: values.emailSubject,
+                addresses: values.addresses,
+                ccAddresses: values.ccAddresses,
+                emailAttachments: values.emailAttachments,
             });
         },
         confirm() {
@@ -162,29 +113,6 @@ export default {
                 messageId: this.details.id,
                 newState: this.actionObj.value,
             });
-        },
-        addAttachments(files) {
-            this.attachments = [...this.attachments, ...files];
-            this.disabledWhileActionInProgress = false;
-        },
-        submittingAttachments() {
-            this.disabledWhileActionInProgress = true;
-        },
-        submittingAttachmentsFinished() {
-            this.disabledWhileActionInProgress = false;
-        },
-        removeAttachment(attachmentId) {
-            this.attachments = this.attachments.filter(
-                obj => obj.id !== attachmentId,
-            );
-        },
-        downloadAttachment(attachmentUrl) {
-            let a = document.createElement('a');
-            a.href = attachmentUrl;
-            a.download = attachmentUrl.split('/').pop();
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
         },
     },
     computed: {

@@ -24,3 +24,25 @@
     border-bottom-style: solid;
     border-bottom-color: #1976d2;
 }
+
+.v-textarea textarea {
+    padding: 5px !important;
+    padding-right: 10px;
+}
+
+.v-textarea textarea:focus {
+    border-style: none !important;
+    outline-style: none !important;
+    box-shadow: none !important;
+}
+
+.emailContent .v-text-field__slot {
+    margin-right: 0px !important;
+}
+
+.detailField input,
+.detailField input:focus {
+    margin-top: 5px;
+    border-style: hidden;
+    box-shadow: 0 0 0 transparent;
+}

@@ -77,7 +77,6 @@ export default {
                 this.loaded = true;
             }
         } catch (e) {
-            console.log('Error: ' + e.message);
             this.error = e.message;
         }
     },
@@ -171,6 +170,7 @@ export default {
                             id: payload.messageId,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
+                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },
@@ -186,6 +186,7 @@ export default {
                             code: payload.newState,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
+                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },

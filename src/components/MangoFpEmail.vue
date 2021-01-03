@@ -3,55 +3,16 @@
         <v-row>
             <v-col>
                 <v-card v-if="composingInProgress">
-                    <v-card-title>
-                        Send email
-                    </v-card-title>
-                    <v-card-subtitle>
-                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
-                        <label class="email-header">
-                            {{ $locStr('Subject') }}
-                            <input v-model="emailSubject" />
-                        </label>
-                    </v-card-subtitle>
-                    <v-divider></v-divider>
-                    <v-card-text style="height: 300px;">
-                        <v-textarea
-                            name="email-text"
-                            no-resize
-                            rows="8"
-                            dense
-                            v-model="emailContent"
-                        ></v-textarea>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn
-                            color="blue darken-1"
-                            outlined
-                            @click.native="send"
-                            :disabled="disabledWhileActionInProgress"
-                        >
-                            {{ $locStr('Send') }}
-                        </v-btn>
-                        <MangoFpAttachment
-                            @attachmentsReceived="addAttachments"
-                            @submittingAttachments="submittingAttachments"
-                            @submittingAttachmentsFinished="
-                                submittingAttachmentsFinished
-                            "
-                        />
-                    </v-card-actions>
-                    <v-chip
-                        class="ma-2"
-                        color="primary"
-                        label
-                        close
-                        v-for="attachment in attachments"
-                        :key="attachment.id"
-                        @click:close="removeAttachment(attachment.id)"
-                        @click="downloadAttachment(attachment.url)"
+                    <MangoFpEmailForm
+                        :emailFormName="$locStr('Send email')"
+                        :emailContent="emailContent"
+                        :emailSubject="emailSubject"
+                        :addresses="addresses"
+                        :ccaddresses="ccaddresses"
+                        :contactEmail="details.email"
+                        @sendEmail="send"
                     >
-                        {{ attachment.file_name }}
-                    </v-chip>
+                    </MangoFpEmailForm>
                 </v-card>
                 <v-card v-else>
                     <v-card-actions>
@@ -71,11 +32,11 @@
 
 <script>
 import { bus } from '../main';
-import MangoFpAttachment from './MangoFpAttachment';
+import MangoFpEmailForm from './MangoFpEmailForm';
 export default {
     name: 'MangoFpEmail',
     components: {
-        MangoFpAttachment,
+        MangoFpEmailForm,
     },
     data() {
         return {
@@ -83,6 +44,7 @@ export default {
             emailContent: '',
             emailSubject: '',
             attachments: [],
+            ccaddresses: [],
             disabledWhileActionInProgress: false,
         };
     },
@@ -96,37 +58,15 @@ export default {
             this.emailContent = 'no content';
             this.emailSubject = '';
         },
-        send() {
+        send(values) {
             bus.$emit('EventSendEmail', {
                 messageId: this.details.id,
-                emailContent: this.emailContent,
-                emailSubject: this.emailSubject,
-                addresses: this.addresses,
-                emailAttachments: this.attachments.map(rec => rec.id),
+                emailContent: values.emailContent,
+                emailSubject: values.emailSubject,
+                addresses: values.addresses,
+                ccAddresses: values.ccAddresses,
+                emailAttachments: values.emailAttachments,
             });
-        },
-        addAttachments(files) {
-            this.attachments = [...this.attachments, ...files];
-            this.disabledWhileActionInProgress = false;
-        },
-        submittingAttachments() {
-            this.disabledWhileActionInProgress = true;
-        },
-        submittingAttachmentsFinished() {
-            this.disabledWhileActionInProgress = false;
-        },
-        removeAttachment(attachmentId) {
-            this.attachments = this.attachments.filter(
-                obj => obj.id !== attachmentId,
-            );
-        },
-        downloadAttachment(attachmentUrl) {
-            let a = document.createElement('a');
-            a.href = attachmentUrl;
-            a.download = attachmentUrl.split('/').pop();
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
         },
         createNewEmail() {
             this.composingInProgress = true;

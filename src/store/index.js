@@ -25,7 +25,6 @@ export default class DataStore {
         }
 
         if (!('code' in stepObj)) {
-            console.log(stepObj);
             throw new Error('code not found in stepObj');
         }
 

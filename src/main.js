@@ -7,7 +7,7 @@ import locStr from './plugins/locStr';
 Vue.config.productionTip = false;
 export const bus = new Vue();
 export const dataStore = new DataStore();
-Vue.use(locStr); //add this to your main.js file
+Vue.use(locStr);
 
 new Vue({
     vuetify,
