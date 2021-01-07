@@ -1,74 +1,123 @@
 <template>
-    <v-flex xs12 sm12>
-        <v-tabs v-if="globalState.templateLoaded" vertical>
-            <v-tab>
-                <v-icon left>mdi-border-color</v-icon>
-            </v-tab>
-            <v-tab>
-                <v-icon left>mdi-history</v-icon>
-            </v-tab>
-            <v-tab>
-                <v-icon left>mdi-email-outline</v-icon>
-            </v-tab>
-            <v-tab-item transition="fade-transition" reverse-transition="false">
-                <v-sheet v-if="selectedItem">
-                    {{ $locStr('Change') }}
-                    <v-select
-                        :class="{ 'margin-left': '-180px' }"
-                        :items="labels"
-                        v-model="selectedLabel"
-                        :label="$locStr('Label')"
+    <v-row class="detailPane">
+        <v-col cols="12" class="pa-2">
+            <v-expansion-panels v-model="dataOpen" multiple>
+                <v-expansion-panel>
+                    <v-expansion-panel-header>
+                        {{
+                            $locStr('Contact data for ') +
+                                ' ' +
+                                details.email +
+                                (selectedLabel.text
+                                    ? ', ' + selectedLabel.text
+                                    : '')
+                        }}
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <v-sheet v-if="selectedItem">
+                            {{ $locStr('Change') }}
+                            <v-select
+                                :class="{ 'margin-left': '-180px' }"
+                                :items="labels"
+                                v-model="selectedLabel"
+                                :label="$locStr('Label')"
+                            >
+                            </v-select>
+                            <v-row>
+                                <v-col cols="6">
+                                    <v-text-field
+                                        class="detailField"
+                                        v-model="details.name"
+                                        :label="$locStr('Name')"
+                                        @change="nameChanged"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="6">
+                                    <v-text-field
+                                        class="detailField"
+                                        v-model="details.email"
+                                        :label="$locStr('Email')"
+                                        @change="emailChanged"
+                                    ></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-textarea
+                                flat
+                                class="detailField"
+                                :rows="rowsForNote"
+                                v-model="details.note"
+                                :label="$locStr('Note')"
+                                @change="noteChanged"
+                            ></v-textarea>
+                            <v-expansion-panels
+                                v-model="contentOpen"
+                                multiple
+                                tile
+                            >
+                                <v-expansion-panel>
+                                    <v-expansion-panel-header>
+                                        {{ $locStr('Additional content') }}
+                                    </v-expansion-panel-header>
+                                    <v-expansion-panel-content>
+                                        <MangoFpMessageInList
+                                            class="contentInDetail"
+                                            v-bind:content="details.content"
+                                        />
+                                    </v-expansion-panel-content>
+                                </v-expansion-panel>
+                            </v-expansion-panels>
+                        </v-sheet>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+            </v-expansion-panels>
+        </v-col>
+        <v-col cols="12">
+            <v-card>
+                <v-tabs v-if="globalState.templateLoaded">
+                    <v-tab>
+                        <v-icon left>mdi-history</v-icon>
+                        {{ $locStr('Action') }}
+                    </v-tab>
+                    <v-tab>
+                        <v-icon left>mdi-email-outline</v-icon>
+                        {{ $locStr('Messages') }}
+                    </v-tab>
+                    <v-tab-item
+                        transition="fade-transition"
+                        reverse-transition="false"
                     >
-                    </v-select>
-                    <v-text-field
-                        class="detailField"
-                        v-model="details.name"
-                        :label="$locStr('Name')"
-                        @change="nameChanged"
-                    ></v-text-field>
-                    <v-text-field
-                        class="detailField"
-                        v-model="details.email"
-                        :label="$locStr('Email')"
-                        @change="emailChanged"
-                    ></v-text-field>
-                    <v-textarea
-                        filled
-                        class="detailField"
-                        :rows="rowsForNote"
-                        v-model="details.note"
-                        :label="$locStr('Note')"
-                        @change="noteChanged"
-                    ></v-textarea>
-                </v-sheet>
-            </v-tab-item>
-            <v-tab-item transition="fade-transition" reverse-transition="false">
-                <MangoFpStateSelector
-                    :selectedTab="selectedTab"
-                    :statuses="statuses"
-                    :contactDetails="details"
-                    :emailTemplates="emailTemplates"
-                    :details="details"
-                />
-                <MangoFpEmailHistory :history="details.changeHistory || []">
-                </MangoFpEmailHistory>
-            </v-tab-item>
-            <v-tab-item transition="fade-transition" reverse-transition="false">
-                <MangoFpEmail
-                    :selectedTab="selectedTab"
-                    :emailTemplates="emailTemplates"
-                    :details="details"
-                />
-                <MangoFpEmailHistory :history="details.changeHistory || []">
-                </MangoFpEmailHistory>
-            </v-tab-item>
-        </v-tabs>
-    </v-flex>
+                        <MangoFpStateSelector
+                            :selectedTab="selectedTab"
+                            :statuses="statuses"
+                            :contactDetails="details"
+                            :emailTemplates="emailTemplates"
+                            :details="details"
+                        />
+                    </v-tab-item>
+                    <v-tab-item
+                        transition="fade-transition"
+                        reverse-transition="false"
+                    >
+                        <MangoFpEmail
+                            :selectedTab="selectedTab"
+                            :emailTemplates="emailTemplates"
+                            :details="details"
+                        />
+                        <MangoFpEmailHistory
+                            :history="details.changeHistory || []"
+                        >
+                        </MangoFpEmailHistory>
+                    </v-tab-item>
+                </v-tabs>
+            </v-card>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
 import MangoFpStateSelector from './MangoFpStateSelector';
 import MangoFpEmailHistory from './MangoFpEmailHistory';
+import MangoFpMessageInList from './MangoFpMessageInLinst';
 import MangoFpEmail from './MangoFpEmail';
 import { bus, dataStore } from '../main';
 import { fetchTemplates } from '../controllers/messages';
@@ -79,6 +128,7 @@ export default {
         MangoFpStateSelector,
         MangoFpEmailHistory,
         MangoFpEmail,
+        MangoFpMessageInList,
     },
     methods: {
         labelChanged(value) {
@@ -129,6 +179,7 @@ export default {
                 label: '',
                 labelId: '',
                 note: '',
+                content: [],
             };
 
             if (!this.selectedItem) {
@@ -144,6 +195,7 @@ export default {
                     id: data.id,
                     note: data.note,
                     changeHistory: data.changeHistory,
+                    content: data.content,
                 };
             }
 
@@ -214,6 +266,8 @@ export default {
     data() {
         return {
             globalState: dataStore,
+            contentOpen: [0],
+            dataOpen: [],
         };
     },
     async mounted() {
@@ -227,5 +281,15 @@ export default {
     margin-top: 5px;
     border-style: hidden;
     box-shadow: 0 0 0 transparent;
+}
+
+.contentInDetail {
+    font-size: 1rem;
+    padding: 0px;
+    padding-top: 5px;
+}
+
+.detailPane {
+    background-color: rgb(241, 241, 241);
 }
 </style>

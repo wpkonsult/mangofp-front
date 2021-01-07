@@ -1,45 +1,64 @@
 <template>
     <v-card class="mb-5">
-        <v-card-title>
+        <v-card-title v-if="emailFormName">
             {{ emailFormName }}
         </v-card-title>
-        <v-card-subtitle>
-            <v-text-field
-                class="detailField"
-                :label="$locStr('Addresses')"
-                :hint="$locStr('Email address (or addresses separated with ;)')"
-                v-model="address4Edit"
-                :error="!!addressesError"
-                :error-messages="addressesError"
-                @blur="validateAddresses"
-                @focus="clearAddressErrors"
-            ></v-text-field>
-            <v-text-field
-                class="detailField"
-                :label="$locStr('CC addresses')"
-                :hint="
-                    $locStr('Email CC address (or addresses separated with ;)')
-                "
-                v-model="ccAddress4Edit"
-                :error="!!ccAddressError"
-                :error-messages="ccAddressError"
-                @blur="validateCCAddresses"
-                @focus="clearCCAddressesErrors"
-            ></v-text-field>
-            <v-text-field
-                class="detailField"
-                :label="$locStr('Subject')"
-                :hint="$locStr('Email subject')"
-                v-model="emailSubject4Edit"
-            ></v-text-field>
-        </v-card-subtitle>
+        <v-card-text class="pt-0 pb-0">
+            <v-row no-gutters>
+                <v-col class="pb-0 pt-0" cols="12" md="7">
+                    <div class="d-flex flex-row">
+                        <div class="labelText align-self-center mr-2">
+                            {{ $locStr('To') }}
+                        </div>
+                        <v-text-field
+                            class="detailField pt-0"
+                            :hint="
+                                $locStr(
+                                    'Email address or addresses separated with ;',
+                                )
+                            "
+                            v-model="address4Edit"
+                            :error="!!addressesError"
+                            :error-messages="addressesError"
+                            @blur="validateAddresses"
+                            @focus="clearAddressErrors"
+                        ></v-text-field>
+                    </div>
+                </v-col>
+                <v-col class="pb-0 pt-0" cols="12" md="5">
+                    <div class="d-flex flex-row">
+                        <div class="labelText align-self-center mr-2 pl-md-2">
+                            {{ $locStr('CC') }}
+                        </div>
+                        <v-text-field
+                            class="detailField pt-0"
+                            :hint="$locStr('Email CC address(es)')"
+                            v-model="ccAddress4Edit"
+                            :error="!!ccAddressError"
+                            :error-messages="ccAddressError"
+                            @blur="validateCCAddresses"
+                            @focus="clearCCAddressesErrors"
+                        ></v-text-field>
+                    </div>
+                </v-col>
+            </v-row>
+            <div class="d-flex flex-row mt-md-n3">
+                <div class="labelText align-self-center mr-2">
+                    {{ $locStr('Subject') }}
+                </div>
+                <v-text-field
+                    class="detailField pt-0"
+                    v-model="emailSubject4Edit"
+                ></v-text-field>
+            </div>
+        </v-card-text>
         <v-divider></v-divider>
-        <v-card-text class="pb-0">
+        <v-card-text class="pb-0 pt-0">
             <v-textarea
+                ref="emailContent"
                 class="emailContent"
                 name="email-text"
-                no-resize
-                rows="10"
+                rows="12"
                 dense
                 solo
                 v-model="emailContent4Edit"
@@ -102,6 +121,9 @@ export default {
             addressesError: '',
             ccAddressError: '',
         };
+    },
+    mounted() {
+        this.setFocusToEmailText();
     },
     methods: {
         getEmailsAsString(addresses = []) {
@@ -226,6 +248,9 @@ export default {
             });
             return emails.filter(elem => elem);
         },
+        setFocusToEmailText() {
+            this.$refs['emailContent'].focus();
+        },
     },
     props: {
         emailFormName: {
@@ -264,6 +289,7 @@ export default {
         },
         contactEmail() {
             this.clearErrors();
+            this.setFocusToEmailText();
             this.address4Edit = this.getEmailsAsString(this.addresses);
             this.ccAddress4Edit = this.getEmailsAsString(this.ccaddresses);
         },

@@ -1,20 +1,31 @@
 <template>
     <v-sheet v-if="loaded" class="pa-md-4">
-        <h2>{{ appVersion }}</h2>
-        <v-select
-            :items="labels"
-            v-model="labelFilter"
-            label="Filter"
-            outlined
-        ></v-select>
+        <v-row no-gutters>
+            <v-col cols="6">
+                <h2 class>{{ appVersion }}</h2>
+            </v-col>
+            <v-col>
+                <v-select
+                    class="generalLabelFilter"
+                    :items="labels"
+                    v-model="labelFilter"
+                    label=""
+                    dense
+                    outlined
+                ></v-select>
+            </v-col>
+        </v-row>
+
         <v-tabs @change="tabChanged">
             <v-tab v-for="status in statuses" :key="status.order">{{
                 status.state
             }}</v-tab>
             <v-tab-item v-for="status in statuses" :key="status.code">
-                <h2>{{ status.state }}</h2>
                 <v-row align="stretch">
-                    <v-col :cols="listWidth">
+                    <v-col
+                        :cols="listWidth"
+                        :lg="listWidth < 12 ? listWidth + 2 : 0"
+                    >
                         <MangoFpListPane
                             value="0"
                             :submitted="filtered"
@@ -23,7 +34,7 @@
                             @row-selected="rowSelected"
                         />
                     </v-col>
-                    <v-col v-if="selectedItem" cols="6">
+                    <v-col v-if="selectedItem" cols="9" lg="7">
                         <MangoFpDetailPane
                             :selectedItem="selectedItem"
                             :submitted="submitted"
@@ -82,10 +93,10 @@ export default {
     },
     methods: {
         openSidePane() {
-            this.listWidth = '6';
+            this.listWidth = 3;
         },
         closeSidePane() {
-            this.listWidth = '12';
+            this.listWidth = 12;
         },
         rowSelected(item) {
             this.selectedItem = item.id;
@@ -170,7 +181,6 @@ export default {
                             id: payload.messageId,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
-                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },
@@ -186,7 +196,6 @@ export default {
                             code: payload.newState,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
-                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },
@@ -284,5 +293,15 @@ export default {
 }
 .v-select.v-text-field input {
     display: none;
+}
+
+.generalLabelFilter .v-text-field__details {
+    display: none;
+}
+
+@media screen and (max-width: 864px) {
+    .v-menu__content {
+        margin-left: -55px;
+    }
 }
 </style>

@@ -1,18 +1,42 @@
 <template>
     <v-container>
-        <v-row>
-            <v-select
-                :class="{ 'margin-left': '-180px' }"
-                :items="actions"
-                :label="$locStr('State')"
-                v-model="actionObj"
-                @change="actionSelected"
-            >
-            </v-select>
-        </v-row>
-        <div v-if="emailContent">
+        <div class="px-3">
+            <v-row no-gutters>
+                <v-col cols="12" sm="6">
+                    <v-row no-gutters>
+                        <v-col class="actionHeader pt-2" cols="12" md="4">
+                            {{ $locStr('Next step') }}
+                        </v-col>
+                        <v-col cols="12" md="8" class="pt-0">
+                            <v-select
+                                class="pt-md-0"
+                                :items="actions"
+                                v-model="actionObj"
+                                @change="actionSelected"
+                            >
+                            </v-select>
+                        </v-col>
+                    </v-row>
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-row no-gutters>
+                        <v-col class="actionHeader pt-2 pl-md-6 toRight">
+                            {{ $locStr('Email message') }}
+                        </v-col>
+                        <v-col class="pt-0 pl-4">
+                            <v-switch
+                                class="mt-0"
+                                inset
+                                v-model="enableEmail"
+                            ></v-switch>
+                        </v-col>
+                    </v-row>
+                </v-col>
+            </v-row>
+        </div>
+        <div v-if="enableEmail">
             <MangoFpEmailForm
-                :emailFormName="actionName"
+                emailFormName=""
                 :emailContent="emailContent"
                 :emailSubject="emailSubject"
                 :addresses="addresses"
@@ -29,12 +53,17 @@
                             actionSlotProps.disabledWhileActionInProgress
                         "
                     >
-                        {{ $locStr('Apply') }}
+                        {{ $locStr('Confirm and send') }}
                     </v-btn>
                 </template>
             </MangoFpEmailForm>
         </div>
-        <v-btn outlined color="blue darken-1" @click.native="confirm">
+        <v-btn
+            v-if="!enableEmail"
+            outlined
+            color="blue darken-1"
+            @click.native="confirm"
+        >
             {{ $locStr('Confirm') }}
         </v-btn>
     </v-container>
@@ -61,12 +90,13 @@ export default {
             actionObj: { value: '', text: '' },
             attachments: [],
             disabledWhileActionInProgress: false,
+            enableEmail: false,
         };
     },
     methods: {
         clear() {
             this.emailContent = '';
-            this.addresses = [];
+            this.addresses = ['[contactEmail]'];
             this.ccaddresses = [];
             this.actionName = '';
             this.emailSubject = '';
@@ -88,6 +118,7 @@ export default {
             });
 
             this.emailContent = content;
+            this.enableEmail = !!content;
             this.emailSubject = 'Re: ' + this.details.label;
 
             const foundAction = this.actions.find(
