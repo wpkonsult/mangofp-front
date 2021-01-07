@@ -40,9 +40,34 @@
     margin-right: 0px !important;
 }
 
+.emailContent .v-input__slot {
+    box-shadow: none !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
 .detailField input,
 .detailField input:focus {
     margin-top: 5px;
     border-style: hidden;
     box-shadow: 0 0 0 transparent;
+}
+
+.actionHeader {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.0125em;
+}
+
+.toRight {
+    text-align: right;
+}
+
+.v-input {
+    font-size: 14px;
+}
+
+.labelText {
+    font-size: 13px;
+    padding-bottom: 10px;
 }

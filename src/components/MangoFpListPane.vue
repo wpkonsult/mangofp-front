@@ -10,9 +10,9 @@
                         :class="{ selectedLine: selectedItem === item.id }"
                     >
                         <td>{{ item.label }}</td>
-                        <td>{{ item.note.substr(0, 200) }}</td>
-                        <td>{{ item.name }}</td>
                         <td>{{ item.email }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.note.substr(0, 200) }}</td>
                         <td>{{ item.lastUpdated }}</td>
                         <td>
                             <MangoFpMessageInList
@@ -61,9 +61,9 @@ export default {
                     width: '20%',
                 },
                 {
-                    text: this.$locStr('Note'),
+                    text: this.$locStr('Email'),
                     align: 'left',
-                    value: 'note',
+                    value: 'email',
                     width: '10%',
                 },
                 {
@@ -73,9 +73,9 @@ export default {
                     width: '10%',
                 },
                 {
-                    text: this.$locStr('Email'),
+                    text: this.$locStr('Note'),
                     align: 'left',
-                    value: 'email',
+                    value: 'note',
                     width: '10%',
                 },
                 {
