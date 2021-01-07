@@ -42,7 +42,6 @@ export default {
         return {
             composingInProgress: false,
             emailContent: '',
-            emailSubject: '',
             attachments: [],
             ccaddresses: [],
             disabledWhileActionInProgress: false,
@@ -52,11 +51,13 @@ export default {
         addresses() {
             return [this.details.email];
         },
+        emailSubject() {
+            return this.details.label || '';
+        },
     },
     methods: {
         clear() {
             this.emailContent = 'no content';
-            this.emailSubject = '';
         },
         send(values) {
             bus.$emit('EventSendEmail', {
@@ -74,7 +75,6 @@ export default {
         cancelEmail() {
             this.composingInProgress = false;
             this.emailContent = '';
-            this.emailSubject = '';
             this.attachments = [];
         },
     },

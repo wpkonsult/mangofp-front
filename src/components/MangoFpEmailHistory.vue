@@ -1,31 +1,71 @@
 <template>
-    <v-data-table
-        :headers="headers"
-        :items="emailHistory"
-        :single-expand="true"
-        :expanded.sync="expanded"
-        item-key="id"
-        show-expand=""
-        hide-default-footer
-    >
-        <template v-slot:expanded-item="{ headers, item }">
-            <td :colspan="headers.length">
-                <v-textarea
-                    :value="item.contentMessage"
-                    messages="test test test"
-                    readonly
-                    auto-grow
-                    light
-                    no-resize
-                    hide-details
-                >
-                </v-textarea>
-            </td>
-        </template>
-    </v-data-table>
+    <v-expansion-panels>
+        <v-expansion-panel v-for="item in emailHistory" :key="item.id">
+            <v-expansion-panel-header>
+                <template v-slot:default="{ open }">
+                    <div>
+                        <v-row no-gutters>
+                            <v-col cols="3">
+                                {{ item.dateTime }}
+                            </v-col>
+                            <v-col cols="3">
+                                {{ getStepName(item.changeSubType) }}
+                            </v-col>
+                            <v-col
+                                cols="6"
+                                v-if="!open"
+                                class="emailExplanationHeader"
+                            >
+                                <div>
+                                    {{ getExplanation(item) }}
+                                </div>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col
+                                class="emailContentPreview"
+                                cols="12"
+                                v-if="!open"
+                            >
+                                {{ getContentPreview(item.contentMessage) }}
+                            </v-col>
+                        </v-row>
+                    </div>
+                </template>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+                <div class="d-flex flex-row">
+                    <div class="emailContentHeaderLabel">
+                        {{ $locStr('To') }}:
+                    </div>
+                    <div class="emailContentHeader">{{ item.contentTo }}:</div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="emailContentHeaderLabel">
+                        {{ $locStr('Subject') }}:
+                    </div>
+                    <div class="emailContentHeader">
+                        {{ item.contentSubject }}
+                    </div>
+                </div>
+                <vue-editor
+                    class="emailContentDetails"
+                    v-model="item.contentMessage"
+                    :editorToolbar="[[]]"
+                    :disabled="true"
+                ></vue-editor>
+            </v-expansion-panel-content>
+        </v-expansion-panel>
+    </v-expansion-panels>
 </template>
 <script>
+import { VueEditor } from 'vue2-editor';
+
 export default {
+    name: 'MangoFpEmailHistory',
+    components: {
+        VueEditor,
+    },
     props: {
         history: {
             type: Array,
@@ -50,14 +90,32 @@ export default {
                     accumulator.push({
                         id: item.id,
                         dateTime: item.create_time,
+                        changeType: item.changeType,
                         changeSubType: item.changeSubType,
                         contentTo: content.to,
                         contentMessage: content.message,
                         contentSubject: content.subject,
                     });
+                } else {
+                    console.dir(item);
                 }
                 return accumulator;
             }, []);
+        },
+    },
+    methods: {
+        getStepName(key) {
+            return key;
+        },
+        getExplanation(item) {
+            return (
+                item.contentSubject || this.locStr('To') + ':' + item.contentTo
+            );
+        },
+        getContentPreview(value) {
+            let elem = document.createElement('div');
+            elem.innerHTML = value;
+            return elem.textContent || '';
         },
     },
 };
@@ -65,4 +123,25 @@ export default {
 <style lang="sass">
 $textarea-padding: 5px
 @import '~vuetify/src/styles/styles.sass'
+
+.emailContentPreview
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+    width: 10px
+    color: rgba(0, 0, 0, 0.87)
+    font-size: 13px
+.emailContentHeaderLabel
+    font-weight: 500
+    margin-right: 5px
+.emailContentDetails
+    div
+        border-color: white !important
+    .ql-toolbar
+        display: none !important
+    .ql-editor
+        padding-left: 0px
+        padding-right: 0px
+        p
+            font-size: 14px
 </style>

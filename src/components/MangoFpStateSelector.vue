@@ -119,7 +119,7 @@ export default {
 
             this.emailContent = content;
             this.enableEmail = !!content;
-            this.emailSubject = 'Re: ' + this.details.label;
+            this.emailSubject = this.details.label;
 
             const foundAction = this.actions.find(
                 action => action.value === value,

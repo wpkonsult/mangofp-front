@@ -52,17 +52,11 @@
                 ></v-text-field>
             </div>
         </v-card-text>
-        <v-divider></v-divider>
         <v-card-text class="pb-0 pt-0">
-            <v-textarea
-                ref="emailContent"
-                class="emailContent"
-                name="email-text"
-                rows="12"
-                dense
-                solo
+            <vue-editor
                 v-model="emailContent4Edit"
-            ></v-textarea>
+                :editorToolbar="editorToolbar"
+            ></vue-editor>
         </v-card-text>
         <v-card-actions class="pt-0 pl-5">
             <slot
@@ -104,11 +98,13 @@
 
 <script>
 import MangoFpAttachment from './MangoFpAttachment';
+import { VueEditor } from 'vue2-editor';
 
 export default {
     name: 'MangoFpEmailForm',
     components: {
         MangoFpAttachment,
+        VueEditor,
     },
     data() {
         return {
@@ -120,6 +116,21 @@ export default {
             emailSubject4Edit: this.emailSubject,
             addressesError: '',
             ccAddressError: '',
+            editorToolbar: [
+                [{ header: [false, 1, 2, 3, 4, 5, 6] }],
+                ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+                [
+                    { align: '' },
+                    { align: 'center' },
+                    { align: 'right' },
+                    { align: 'justify' },
+                ],
+                [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+                [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+                [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+                ['link'],
+                ['clean'], // remove formatting butto
+            ],
         };
     },
     mounted() {
@@ -249,7 +260,8 @@ export default {
             return emails.filter(elem => elem);
         },
         setFocusToEmailText() {
-            this.$refs['emailContent'].focus();
+            //TODO - figure out how to focus automaticly (focus method will not work)
+            //this.$refs['emailContent'].focus();
         },
     },
     props: {
