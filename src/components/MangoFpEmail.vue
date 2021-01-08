@@ -2,7 +2,7 @@
     <v-container>
         <v-row>
             <v-col>
-                <v-card v-if="composingInProgress">
+                <v-card>
                     <MangoFpEmailForm
                         :emailFormName="$locStr('Send email')"
                         :emailContent="emailContent"
@@ -13,17 +13,6 @@
                         @sendEmail="send"
                     >
                     </MangoFpEmailForm>
-                </v-card>
-                <v-card v-else>
-                    <v-card-actions>
-                        <v-btn
-                            color="blue darken-1"
-                            outlined
-                            @click.native="createNewEmail"
-                        >
-                            Compose new email
-                        </v-btn>
-                    </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>

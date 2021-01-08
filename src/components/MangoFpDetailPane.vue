@@ -4,6 +4,30 @@
             <v-expansion-panels v-model="dataOpen" multiple>
                 <v-expansion-panel>
                     <v-expansion-panel-header>
+                        <template v-slot:default="{ open }">
+                            <div v-if="!open">
+                                <v-row class="d-flex">
+                                    <div class="mr-2 pl-2 actionHeader">
+                                        {{ $locStr('Contact data for') }}:
+                                    </div>
+                                    <div>
+                                        {{ getContactDataSummary() }}
+                                    </div>
+                                </v-row>
+                                <v-row>
+                                    <v-col cols="12" class="notePreview pl-2">
+                                        {{ details.note }}
+                                    </v-col>
+                                </v-row>
+                            </div>
+                            <div v-else>
+                                <v-row>
+                                    <div class="actionHeader pl-2">
+                                        {{ $locStr('Change Contact Data') }}
+                                    </div>
+                                </v-row>
+                            </div>
+                        </template>
                         {{
                             $locStr('Contact data for ') +
                                 ' ' +
@@ -15,7 +39,6 @@
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
                         <v-sheet v-if="selectedItem">
-                            {{ $locStr('Change') }}
                             <v-select
                                 :class="{ 'margin-left': '-180px' }"
                                 :items="labels"
@@ -151,6 +174,12 @@ export default {
                 message: { ...this.details, note: value },
             });
         },
+        getContactDataSummary() {
+            return (
+                this.details.email +
+                (this.selectedLabel.text ? ', ' + this.selectedLabel.text : '')
+            );
+        },
     },
     computed: {
         actions() {
@@ -276,6 +305,7 @@ export default {
 };
 </script>
 <style>
+@import '../assets/css/mangofp.css';
 .detailField input,
 .detailField input:focus {
     margin-top: 5px;
@@ -291,5 +321,17 @@ export default {
 
 .detailPane {
     background-color: rgb(241, 241, 241);
+}
+.contactDetailsLabel {
+    font-size: 15px;
+}
+
+.notePreview {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100px;
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 13px;
 }
 </style>

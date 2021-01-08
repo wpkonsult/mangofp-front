@@ -6,10 +6,15 @@
                     <div>
                         <v-row no-gutters>
                             <v-col cols="3">
-                                {{ item.dateTime }}
+                                {{ getFormattedDate(item.dateTime) }}
                             </v-col>
                             <v-col cols="3">
-                                {{ getStepName(item.changeSubType) }}
+                                <v-chip class="mt-n1" small color="primary">
+                                    <v-icon left>
+                                        mdi-label
+                                    </v-icon>
+                                    {{ getStepName(item.changeSubType) }}
+                                </v-chip>
                             </v-col>
                             <v-col
                                 cols="6"
@@ -60,6 +65,7 @@
 </template>
 <script>
 import { VueEditor } from 'vue2-editor';
+import dateFormat from 'dateformat';
 
 export default {
     name: 'MangoFpEmailHistory',
@@ -104,6 +110,15 @@ export default {
         },
     },
     methods: {
+        getFormattedDate(dateIsoString) {
+            const now = new Date(2021, 11, 31);
+            var dateFormatStr = now.toLocaleDateString();
+            dateFormatStr = dateFormatStr.replace('31', 'dd');
+            dateFormatStr = dateFormatStr.replace('12', 'mm');
+            dateFormatStr = dateFormatStr.replace('2021', 'yyyy');
+            const paramDate = new Date(dateIsoString);
+            return dateFormat(paramDate, dateFormatStr);
+        },
         getStepName(key) {
             return key;
         },
