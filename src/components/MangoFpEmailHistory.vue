@@ -167,7 +167,6 @@ export default {
             elem.innerHTML = value;
             return elem.textContent || '';
         },
-
         getItemType(item) {
             const itemType = item.changeSubType || 'default';
 
