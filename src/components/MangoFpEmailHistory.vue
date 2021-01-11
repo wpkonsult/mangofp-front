@@ -158,7 +158,7 @@ export default {
 
         getExplanation(item) {
             return (
-                item.contentSubject || this.locStr('To') + ':' + item.contentTo
+                item.contentSubject || this.$locStr('To') + ':' + item.contentTo
             );
         },
 
