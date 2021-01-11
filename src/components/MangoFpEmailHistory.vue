@@ -9,11 +9,16 @@
                                 {{ getFormattedDate(item.dateTime) }}
                             </v-col>
                             <v-col cols="3">
-                                <v-chip class="mt-n1" small color="primary">
+                                <v-chip
+                                    class="mt-n1"
+                                    small
+                                    :color="getItemType(item).color"
+                                    outlined
+                                >
                                     <v-icon left>
-                                        mdi-label
+                                        {{ getItemType(item).icon }}
                                     </v-icon>
-                                    {{ getStepName(item.changeSubType) }}
+                                    {{ getItemType(item).name }}
                                 </v-chip>
                             </v-col>
                             <v-col
@@ -66,6 +71,7 @@
 <script>
 import { VueEditor } from 'vue2-editor';
 import dateFormat from 'dateformat';
+import { dataStore } from '../main';
 
 export default {
     name: 'MangoFpEmailHistory',
@@ -86,6 +92,29 @@ export default {
                 { text: this.$locStr('Status'), value: 'changeSubType' },
                 { text: this.$locStr('To'), value: 'contentTo' },
             ],
+
+            messageTypes: {
+                step: {
+                    color: 'primary',
+                    icon: 'mdi-label-outline',
+                    name: this.$locStr('unknown step'),
+                },
+                none: {
+                    color: 'indigo',
+                    icon: 'mdi-email-outline',
+                    name: this.$locStr('email'),
+                },
+                reply: {
+                    color: 'success',
+                    icon: 'mdi-reply-outline',
+                    name: this.$locStr('reply'),
+                },
+                default: {
+                    color: 'indigo',
+                    icon: 'mdi-note-text-outline',
+                    name: this.$locStr('other action'),
+                },
+            },
         };
     },
     computed: {
@@ -108,6 +137,13 @@ export default {
                 return accumulator;
             }, []);
         },
+        allSteps() {
+            try {
+                return dataStore.getSteps();
+            } catch (e) {
+                return {};
+            }
+        },
     },
     methods: {
         getFormattedDate(dateIsoString) {
@@ -119,18 +155,32 @@ export default {
             const paramDate = new Date(dateIsoString);
             return dateFormat(paramDate, dateFormatStr);
         },
-        getStepName(key) {
-            return key;
-        },
+
         getExplanation(item) {
             return (
                 item.contentSubject || this.locStr('To') + ':' + item.contentTo
             );
         },
+
         getContentPreview(value) {
             let elem = document.createElement('div');
             elem.innerHTML = value;
             return elem.textContent || '';
+        },
+
+        getItemType(item) {
+            const itemType = item.changeSubType || 'default';
+
+            if (itemType in this.allSteps) {
+                const name = this.allSteps[itemType].state || itemType;
+                return { ...this.messageTypes['step'], name };
+            }
+
+            if (itemType in this.messageTypes) {
+                return this.messageTypes[itemType];
+            }
+
+            return this.messageTypes['default'];
         },
     },
 };
