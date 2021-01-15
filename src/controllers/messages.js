@@ -48,7 +48,19 @@ async function fetchMessagesData() {
         throw new Error('No messages found in response');
     }
 
-    return data.messages;
+    function compareByLastUpdated(a, b) {
+        const aLastUpdated = a.lastUpdated;
+        const bLastUpdated = b.lastUpdated;
+        if (aLastUpdated < bLastUpdated) {
+            return 1;
+        }
+        if (aLastUpdated > bLastUpdated) {
+            return -1;
+        }
+        return 0;
+    }
+
+    return data.messages.sort(compareByLastUpdated);
 }
 
 function setMessages(messagesData) {

@@ -71,3 +71,13 @@
     font-size: 13px;
     padding-bottom: 10px;
 }
+
+.emailEditor {
+    color: black;
+    font-size: 15px;
+}
+
+.emailEditor p {
+    color: black;
+    font-size: 15px;
+}

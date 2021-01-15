@@ -54,6 +54,7 @@
         </v-card-text>
         <v-card-text class="pb-0 pt-0">
             <vue-editor
+                class="emailEditor"
                 v-model="emailContent4Edit"
                 :editorToolbar="editorToolbar"
             ></vue-editor>

@@ -131,8 +131,6 @@ export default {
                         contentMessage: content.message,
                         contentSubject: content.subject,
                     });
-                } else {
-                    console.dir(item);
                 }
                 return accumulator;
             }, []);
