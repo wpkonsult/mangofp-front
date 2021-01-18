@@ -253,7 +253,7 @@ export default {
                 const RegValidate = /([a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/;
                 if (!RegValidate.test(email)) {
                     throw new Error(
-                        email + ' ' + this.$locStr('is not proper email'),
+                        this.$locStr('Email format is not correct'),
                     );
                 }
                 return email;
