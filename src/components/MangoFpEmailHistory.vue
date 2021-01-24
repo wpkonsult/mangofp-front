@@ -1,7 +1,7 @@
 <template>
     <v-expansion-panels>
         <v-expansion-panel v-for="item in emailHistory" :key="item.id">
-            <v-expansion-panel-header>
+            <v-expansion-panel-header class="pb-0">
                 <template v-slot:default="{ open }">
                     <div>
                         <v-row no-gutters>

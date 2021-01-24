@@ -81,3 +81,8 @@
     color: black;
     font-size: 15px;
 }
+
+.small-action-button {
+    max-width: 20px;
+    max-height: 20px;
+}

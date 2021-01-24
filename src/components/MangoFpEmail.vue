@@ -1,9 +1,10 @@
 <template>
     <v-container>
-        <v-row>
+        <v-row no-gutters>
             <v-col>
                 <v-card>
                     <MangoFpEmailForm
+                        v-if="composingInProgress"
                         :emailFormName="$locStr('Send email')"
                         :emailContent="emailContent"
                         :emailSubject="emailSubject"
@@ -11,8 +12,14 @@
                         :ccaddresses="ccaddresses"
                         :contactEmail="details.email"
                         @sendEmail="send"
+                        @cancelEmail="cancelEmail"
                     >
                     </MangoFpEmailForm>
+                    <div v-else class="pa-5">
+                        <v-btn color="primary" outlined @click="createNewEmail">
+                            {{ $locStr('New email') }}
+                        </v-btn>
+                    </div>
                 </v-card>
             </v-col>
         </v-row>
@@ -45,9 +52,6 @@ export default {
         },
     },
     methods: {
-        clear() {
-            this.emailContent = 'no content';
-        },
         send(values) {
             bus.$emit('EventSendEmail', {
                 messageId: this.details.id,
@@ -57,9 +61,12 @@ export default {
                 ccAddresses: values.ccAddresses,
                 emailAttachments: values.emailAttachments,
             });
+            this.composingInProgress = false;
         },
         createNewEmail() {
             this.composingInProgress = true;
+            this.emailContent = '';
+            this.attachments = [];
         },
         cancelEmail() {
             this.composingInProgress = false;

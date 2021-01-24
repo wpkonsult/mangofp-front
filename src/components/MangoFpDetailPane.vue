@@ -1,5 +1,16 @@
 <template>
     <v-row class="detailPane">
+        <div class="ml-auto pt-2 pr-2 mb-n1">
+            <v-btn
+                x-small
+                class="small-action-button"
+                color="gray"
+                icon
+                @click="closeDetailsPane"
+            >
+                <v-icon>mdi-close</v-icon>
+            </v-btn>
+        </div>
         <v-col cols="12" class="pa-2">
             <v-expansion-panels v-model="dataOpen" multiple>
                 <v-expansion-panel>
@@ -179,6 +190,10 @@ export default {
                 this.details.email +
                 (this.selectedLabel.text ? ', ' + this.selectedLabel.text : '')
             );
+        },
+
+        closeDetailsPane() {
+            this.$emit('CloseDetails');
         },
     },
     computed: {

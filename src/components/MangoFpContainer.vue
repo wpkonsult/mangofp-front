@@ -34,13 +34,19 @@
                             @row-selected="rowSelected"
                         />
                     </v-col>
-                    <v-col v-if="selectedItem" cols="9" lg="7">
+                    <v-col
+                        v-if="selectedItem"
+                        cols="9"
+                        lg="7"
+                        class="detailPaneContainer"
+                    >
                         <MangoFpDetailPane
                             :selectedItem="selectedItem"
                             :submitted="submitted"
                             :labelsData="labelsData"
                             :selectedTab="selectedTab"
                             :statuses="statuses"
+                            @CloseDetails="closeSidePane"
                         />
                     </v-col>
                 </v-row>
@@ -97,6 +103,7 @@ export default {
         },
         closeSidePane() {
             this.listWidth = 12;
+            this.selectedItem = '';
         },
         rowSelected(item) {
             this.selectedItem = item.id;
@@ -108,7 +115,6 @@ export default {
         },
         tabChanged(tab) {
             this.selectedTab = tab;
-            this.selectedItem = '';
             this.closeSidePane();
         },
         subscribe() {
@@ -170,7 +176,6 @@ export default {
                     bus,
                 );
                 if (success) {
-                    this.selectedItem = '';
                     this.closeSidePane();
                 }
             });
@@ -181,6 +186,7 @@ export default {
                             id: payload.messageId,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
+                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },
@@ -196,6 +202,7 @@ export default {
                             code: payload.newState,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
+                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },
@@ -297,6 +304,10 @@ export default {
 
 .generalLabelFilter .v-text-field__details {
     display: none;
+}
+
+.detailPaneContainer {
+    background-color: rgb(241, 241, 241);
 }
 
 @media screen and (max-width: 864px) {

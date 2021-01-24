@@ -1,7 +1,20 @@
 <template>
     <v-card class="mb-5">
-        <v-card-title v-if="emailFormName">
-            {{ emailFormName }}
+        <v-card-title class="pb-0" v-if="emailFormName">
+            <div class="d-inline-block">
+                {{ emailFormName }}
+            </div>
+            <div class="d-inline-block ml-auto">
+                <v-btn
+                    x-small
+                    class="small-action-button"
+                    color="gray"
+                    icon
+                    @click="cancel"
+                >
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </div>
         </v-card-title>
         <v-card-text class="pt-0 pb-0">
             <v-row no-gutters>
@@ -214,6 +227,9 @@ export default {
                 ccAddresses,
                 emailAttachments: this.attachments.map(rec => rec.id),
             });
+        },
+        cancel() {
+            this.$emit('cancelEmail');
         },
         addAttachments(files) {
             this.attachments = [...this.attachments, ...files];

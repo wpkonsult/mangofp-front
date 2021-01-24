@@ -1,6 +1,12 @@
 <template>
     <v-sheet>
-        <v-data-table :headers="headers" :items="submitted">
+        <v-data-table
+            :headers="headers"
+            :items="submitted"
+            :hide-default-footer="true"
+            :disable-pagination="true"
+            dense
+        >
             <template slot="body" slot-scope="props">
                 <tbody>
                     <tr
