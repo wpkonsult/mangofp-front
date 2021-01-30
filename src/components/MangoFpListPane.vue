@@ -20,7 +20,7 @@
                         <td>{{ item.name }}</td>
                         <td>{{ item.note.substr(0, 200) }}</td>
                         <td>{{ item.lastUpdated }}</td>
-                        <td>
+                        <td v-if="showDetails">
                             <MangoFpMessageInList
                                 v-bind:content="item.content"
                             />
@@ -55,11 +55,19 @@ export default {
             type: Array,
             required: true,
         },
+        showDetails: {
+            type: Boolean,
+            required: false,
+        },
     },
     data() {
         return {
             search: '',
-            headers: [
+        };
+    },
+    computed: {
+        headers() {
+            const ret = [
                 {
                     text: this.$locStr('Label'),
                     align: 'left',
@@ -90,10 +98,20 @@ export default {
                     value: 'lastUpdated',
                     width: '10%',
                 },
-                { text: 'Sisu', align: 'left', value: 'content', width: '40%' },
-                { text: '', align: 'left', value: '' },
-            ],
-        };
+            ];
+
+            if (this.showDetails) {
+                ret.push({
+                    text: 'Sisu',
+                    align: 'left',
+                    value: 'content',
+                    width: '40%',
+                });
+            }
+
+            ret.push({ text: '', align: 'left', value: '' });
+            return ret;
+        },
     },
 };
 </script>

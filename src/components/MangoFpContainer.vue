@@ -32,6 +32,7 @@
                             :selectedItem="selectedItem"
                             :labelsData="labelsData"
                             @row-selected="rowSelected"
+                            :showDetails="!detailPaneIsOpen"
                         />
                     </v-col>
                     <v-col
@@ -277,6 +278,9 @@ export default {
             });
 
             return labels;
+        },
+        detailPaneIsOpen() {
+            return this.listWidth != 12;
         },
     },
     data() {
