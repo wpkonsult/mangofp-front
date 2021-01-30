@@ -14,7 +14,7 @@
         <v-col cols="12" class="pa-2">
             <v-expansion-panels v-model="dataOpen" multiple>
                 <v-expansion-panel>
-                    <v-expansion-panel-header>
+                    <v-expansion-panel-header class="pb-1">
                         <template v-slot:default="{ open }">
                             <div v-if="!open">
                                 <v-row class="d-flex">
@@ -25,6 +25,11 @@
                                         {{ getContactDataSummary() }}
                                     </div>
                                 </v-row>
+                                <div class="pt-3 content-on-detail-header">
+                                    <MangoFpMessageInList
+                                        v-bind:content="details.content"
+                                    />
+                                </div>
                                 <v-row>
                                     <v-col cols="12" class="notePreview pl-2">
                                         {{ details.note }}
@@ -32,52 +37,58 @@
                                 </v-row>
                             </div>
                             <div v-else>
-                                <v-row>
-                                    <div class="actionHeader pl-2">
-                                        {{ $locStr('Change Contact Data') }}
+                                <v-row no-gutters>
+                                    <div class="actionHeader">
+                                        <div>
+                                            {{ $locStr('Change Contact Data') }}
+                                        </div>
                                     </div>
                                 </v-row>
                             </div>
                         </template>
-                        {{
-                            $locStr('Contact data for ') +
-                                ' ' +
-                                details.email +
-                                (selectedLabel.text
-                                    ? ', ' + selectedLabel.text
-                                    : '')
-                        }}
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
                         <v-sheet v-if="selectedItem">
-                            <v-select
-                                :class="{ 'margin-left': '-180px' }"
-                                :items="labels"
-                                v-model="selectedLabel"
-                                :label="$locStr('Label')"
-                            >
-                            </v-select>
-                            <v-row>
-                                <v-col cols="6">
+                            <div class="d-flex flex-row email-details-on-cd">
+                                <div class="labelText align-self-center mr-2">
+                                    {{ $locStr('Label') }}
+                                </div>
+                                <v-select
+                                    class="mb-0 pb-1"
+                                    :items="labels"
+                                    v-model="selectedLabel"
+                                >
+                                </v-select>
+                            </div>
+                            <v-row no-gutters class="email-details-on-cd">
+                                <v-col cols="6" class="d-flex flex-row">
+                                    <div
+                                        class="labelText align-self-center mr-2 pb-4"
+                                    >
+                                        {{ $locStr('Name') }}
+                                    </div>
                                     <v-text-field
-                                        class="detailField"
+                                        class="detailField pt-0"
                                         v-model="details.name"
-                                        :label="$locStr('Name')"
                                         @change="nameChanged"
                                     ></v-text-field>
                                 </v-col>
-                                <v-col cols="6">
+                                <v-col cols="6" class="d-flex flex-row">
+                                    <div
+                                        class="labelText align-self-center ml-2 mr-2 pb-4"
+                                    >
+                                        {{ $locStr('Email') }}
+                                    </div>
                                     <v-text-field
-                                        class="detailField"
+                                        class="detailField pt-0"
                                         v-model="details.email"
-                                        :label="$locStr('Email')"
                                         @change="emailChanged"
                                     ></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-textarea
                                 flat
-                                class="detailField"
+                                class="detailField pt-0"
                                 :rows="rowsForNote"
                                 v-model="details.note"
                                 :label="$locStr('Note')"
@@ -252,7 +263,7 @@ export default {
 
             let maxRows = 30;
 
-            let minRows = 5;
+            let minRows = 1;
             const data = this.submitted.find(s => s.id === this.selectedItem);
             if (!data.note) {
                 return minRows;
@@ -348,5 +359,15 @@ export default {
     width: 100px;
     color: rgba(0, 0, 0, 0.87);
     font-size: 13px;
+}
+
+.content-on-detail-header strong {
+    color: rgba(0, 0, 0, 0.54);
+    font-weight: normal;
+}
+
+.email-details-on-cd .labelText {
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 15px;;
 }
 </style>

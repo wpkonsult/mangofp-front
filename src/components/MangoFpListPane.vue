@@ -18,8 +18,8 @@
                         <td>{{ item.label }}</td>
                         <td>{{ item.email }}</td>
                         <td>{{ item.name }}</td>
-                        <td>{{ item.note.substr(0, 200) }}</td>
-                        <td>{{ item.lastUpdated }}</td>
+                        <td>{{ item.note.substr(0, 100) }}</td>
+                        <td>{{ getFormattedDate(item.lastUpdated) }}</td>
                         <td v-if="showDetails">
                             <MangoFpMessageInList
                                 v-bind:content="item.content"
@@ -35,6 +35,7 @@
 
 <script>
 import MangoFpMessageInList from './MangoFpMessageInLinst';
+import { getFormattedDate } from '../plugins/utils';
 
 export default {
     name: 'MangoFpListPane',
@@ -44,6 +45,9 @@ export default {
     methods: {
         selectItem: function(item) {
             this.$emit('row-selected', item);
+        },
+        getFormattedDate(dateIsoString) {
+            return getFormattedDate(dateIsoString);
         },
     },
     props: {

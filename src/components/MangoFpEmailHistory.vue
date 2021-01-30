@@ -70,8 +70,8 @@
 </template>
 <script>
 import { VueEditor } from 'vue2-editor';
-import dateFormat from 'dateformat';
 import { dataStore } from '../main';
+import { getFormattedDate } from '../plugins/utils';
 
 export default {
     name: 'MangoFpEmailHistory',
@@ -145,15 +145,8 @@ export default {
     },
     methods: {
         getFormattedDate(dateIsoString) {
-            const now = new Date(2021, 11, 31);
-            var dateFormatStr = now.toLocaleDateString();
-            dateFormatStr = dateFormatStr.replace('31', 'dd');
-            dateFormatStr = dateFormatStr.replace('12', 'mm');
-            dateFormatStr = dateFormatStr.replace('2021', 'yyyy');
-            const paramDate = new Date(dateIsoString);
-            return dateFormat(paramDate, dateFormatStr);
+            return getFormattedDate(dateIsoString);
         },
-
         getExplanation(item) {
             return (
                 item.contentSubject || this.$locStr('To') + ':' + item.contentTo
