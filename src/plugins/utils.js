@@ -6,6 +6,6 @@ export function getFormattedDate(dateIsoString) {
     dateFormatStr = dateFormatStr.replace('30', 'dd');
     dateFormatStr = dateFormatStr.replace('12', 'mm');
     dateFormatStr = dateFormatStr.replace('2021', 'yyyy');
-    const paramDate = new Date(dateIsoString);
+    const paramDate = new Date(dateIsoString.replace(/-/g, '/'));
     return dateFormat(paramDate, dateFormatStr);
 }
