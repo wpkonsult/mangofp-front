@@ -368,6 +368,6 @@ export default {
 
 .email-details-on-cd .labelText {
     color: rgba(0, 0, 0, 0.54);
-    font-size: 15px;;
+    font-size: 15px;
 }
 </style>

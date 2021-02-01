@@ -2,9 +2,16 @@
 import axios from 'axios';
 
 const ROOT_URL = MANGOFP_RESOURCES['adminUrl'];
+const nonce = MANGOFP_RESOURCES['nonce'];
 
 async function makeGetRequest(endpoint) {
-    const res = await axios.get(ROOT_URL + endpoint);
+    const config = {
+        headers: {
+            'X-WP-Nonce': nonce,
+        },
+    };
+    console.log(config);
+    const res = await axios.get(ROOT_URL + endpoint, config);
     if (!res || res.status !== 200) {
         throw new Error('Unable to read data from ' + endpoint);
     }
@@ -21,7 +28,12 @@ async function makeGetRequest(endpoint) {
 }
 
 async function makePostRequest(endpoint, payload) {
-    const res = await axios.post(ROOT_URL + endpoint, payload);
+    const config = {
+        headers: {
+            'X-WP-Nonce': nonce,
+        },
+    };
+    const res = await axios.post(ROOT_URL + endpoint, payload, config);
     if (!res || res.status !== 200) {
         throw new Error('Error received from request. Details: ' + endpoint);
     }
