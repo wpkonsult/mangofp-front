@@ -252,7 +252,6 @@ export default {
         },
         selectAll() {
             this.$nextTick(() => {
-                console.log('All selected');
                 this.labelFilter = [];
             });
         },
@@ -285,12 +284,11 @@ export default {
             return ret;
         },
         filtered() {
-            console.log('Label filter: ' + this.labelFilter);
             return this.submitted.filter(
                 elem =>
-                    this.labelFilter.length == 0 ||
-                    (this.labelFilter.includes(elem.labelId) &&
-                        elem.code === this.statuses[this.selectedTab].code),
+                    elem.code === this.statuses[this.selectedTab].code &&
+                    (this.labelFilter.length == 0 ||
+                        this.labelFilter.includes(elem.labelId)),
             );
         },
         labels() {
