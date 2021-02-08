@@ -9,10 +9,31 @@
                     class="generalLabelFilter"
                     :items="labels"
                     v-model="labelFilter"
-                    label=""
+                    label="Filter labels"
                     dense
+                    multiple
                     outlined
-                ></v-select>
+                >
+                    <template v-slot:prepend-item>
+                        <v-list-item ripple @click="selectAll">
+                            <v-list-item-action>
+                                <v-icon
+                                    :color="
+                                        labelFilter.length == 0 ? 'primary' : ''
+                                    "
+                                >
+                                    {{ icon }}
+                                </v-icon>
+                            </v-list-item-action>
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    {{ $locStr('No filter') }}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-divider class="mt-2"></v-divider>
+                    </template>
+                </v-select>
             </v-col>
         </v-row>
 
@@ -229,6 +250,11 @@ export default {
                 }
             });
         },
+        selectAll() {
+            this.$nextTick(() => {
+                this.labelFilter = [];
+            });
+        },
     },
     computed: {
         appVersion() {
@@ -260,10 +286,9 @@ export default {
         filtered() {
             return this.submitted.filter(
                 elem =>
-                    (!this.labelFilter ||
-                        this.labelFilter === '000' ||
-                        elem.labelId === this.labelFilter) &&
-                    elem.code === this.statuses[this.selectedTab].code,
+                    elem.code === this.statuses[this.selectedTab].code &&
+                    (this.labelFilter.length == 0 ||
+                        this.labelFilter.includes(elem.labelId)),
             );
         },
         labels() {
@@ -271,16 +296,16 @@ export default {
                 value: item.id,
                 text: item.name,
             }));
-
-            labels.unshift({
-                value: '000',
-                text: '--- ' + this.$locStr('All') + ' ---',
-            });
-
             return labels;
         },
         detailPaneIsOpen() {
             return this.listWidth != 12;
+        },
+        icon() {
+            if (this.labelFilter.length == 0) {
+                return 'mdi-checkbox-marked';
+            }
+            return 'mdi-checkbox-blank-outline';
         },
     },
     data() {
@@ -288,7 +313,7 @@ export default {
             selectedItem: '',
             listWidth: '12',
             loaded: false,
-            labelFilter: '000',
+            labelFilter: [],
             selectedTab: 1,
             statuses: [],
             stateData: [],
