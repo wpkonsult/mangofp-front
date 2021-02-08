@@ -68,6 +68,7 @@ export default {
                     {
                         headers: {
                             'Content-Type': 'multipart/form-data',
+                            'X-WP-Nonce': MANGOFP_RESOURCES['nonce'],
                         },
                         onUploadProgress,
                     },

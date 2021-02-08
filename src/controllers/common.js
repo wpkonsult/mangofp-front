@@ -10,7 +10,6 @@ async function makeGetRequest(endpoint) {
             'X-WP-Nonce': nonce,
         },
     };
-    console.log(config);
     const res = await axios.get(ROOT_URL + endpoint, config);
     if (!res || res.status !== 200) {
         throw new Error('Unable to read data from ' + endpoint);
