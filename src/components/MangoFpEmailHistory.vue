@@ -58,26 +58,18 @@
                         {{ item.contentSubject }}
                     </div>
                 </div>
-                <vue-editor
-                    class="emailContentDetails"
-                    v-model="item.contentMessage"
-                    :editorToolbar="[[]]"
-                    :disabled="true"
-                ></vue-editor>
+                <div v-html="item.contentMessage"
+                ></div>
             </v-expansion-panel-content>
         </v-expansion-panel>
     </v-expansion-panels>
 </template>
 <script>
-import { VueEditor } from 'vue2-editor';
 import { dataStore } from '../main';
 import { getFormattedDate } from '../plugins/utils';
 
 export default {
     name: 'MangoFpEmailHistory',
-    components: {
-        VueEditor,
-    },
     props: {
         history: {
             type: Array,
@@ -128,6 +120,18 @@ export default {
                         changeType: item.changeType,
                         changeSubType: item.changeSubType,
                         contentTo: content.to,
+                        contentMessage: content.message,
+                        contentSubject: content.subject,
+                    });
+                } else if (item.changeType === 'EMAIL_RECEIVED') {
+                    const content = JSON.parse(item.content);
+                    accumulator.push({
+                        id: item.id,
+                        dateTime: item.create_time,
+                        changeType: item.changeType,
+                        changeSubType: 'reply',
+                        contentTo: '',
+                        contentFrom: content.from,
                         contentMessage: content.message,
                         contentSubject: content.subject,
                     });
