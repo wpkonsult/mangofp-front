@@ -58,8 +58,7 @@
                         {{ item.contentSubject }}
                     </div>
                 </div>
-                <div v-html="item.contentMessage"
-                ></div>
+                <div v-html="item.contentMessage"></div>
             </v-expansion-panel-content>
         </v-expansion-panel>
     </v-expansion-panels>
