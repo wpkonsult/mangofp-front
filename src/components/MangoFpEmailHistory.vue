@@ -30,6 +30,51 @@
                                     {{ getExplanation(item) }}
                                 </div>
                             </v-col>
+                            <v-col cols="6" v-else>
+                                <div class="ml-auto">
+                                    <div class="text-right">
+                                        <v-menu top :close-on-click="true">
+                                            <template
+                                                v-slot:activator="{ on, attrs }"
+                                            >
+                                                <v-btn
+                                                    class="mr-2 historyItemMenu"
+                                                    fab
+                                                    outlined
+                                                    x-small
+                                                    color="primary"
+                                                    v-bind="attrs"
+                                                    v-on="on"
+                                                >
+                                                    <v-icon dark>
+                                                        mdi-minus
+                                                    </v-icon>
+                                                </v-btn>
+                                            </template>
+
+                                            <v-list>
+                                                <v-list-item
+                                                    class="historyItemMenuRow"
+                                                    v-for="(menuItem,
+                                                    index) in menuItems"
+                                                    :key="index"
+                                                >
+                                                    <v-list-item-title
+                                                        @click="
+                                                            menuItem.action(
+                                                                item,
+                                                            )
+                                                        "
+                                                        >{{
+                                                            menuItem.title
+                                                        }}</v-list-item-title
+                                                    >
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-menu>
+                                    </div>
+                                </div>
+                            </v-col>
                         </v-row>
                         <v-row>
                             <v-col
@@ -106,6 +151,7 @@ export default {
                     name: this.$locStr('other action'),
                 },
             },
+            menuItems: [{ title: 'Mark unread', action: this.markUnread }],
         };
     },
     computed: {
@@ -175,6 +221,11 @@ export default {
 
             return this.messageTypes['default'];
         },
+        markUnread(item) {
+            console.log('About to mark unread');
+            console.log(item);
+            //TODO: create action for marking the item as unread
+        },
     },
 };
 </script>
@@ -192,6 +243,14 @@ $textarea-padding: 5px
 .emailContentHeaderLabel
     font-weight: 500
     margin-right: 5px
+.historyItemMenu
+    height: 20px !important
+    width: 20px !important
+    &:hover
+        background-color: #eeeeee
+.historyItemMenuRow
+    &:hover
+        background-color: #eeeeee
 .emailContentDetails
     div
         border-color: white !important
