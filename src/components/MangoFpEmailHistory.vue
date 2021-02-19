@@ -1,11 +1,18 @@
 <template>
-    <v-expansion-panels>
-        <v-expansion-panel v-for="item in emailHistory" :key="item.id">
-            <v-expansion-panel-header class="pb-0">
+    <v-expansion-panels v-model="expanded">
+        <v-expansion-panel
+            v-for="item in emailHistory"
+            :key="item.id"
+            :ref="'panel' + item.id"
+        >
+            <v-expansion-panel-header
+                class="pb-0"
+                @click="clickOnPanelHeader(item)"
+            >
                 <template v-slot:default="{ open }">
                     <div>
                         <v-row no-gutters>
-                            <v-col cols="3">
+                            <v-col cols="3" :class="item.headerClasses">
                                 {{ getFormattedDate(item.dateTime) }}
                             </v-col>
                             <v-col cols="3">
@@ -26,7 +33,7 @@
                                 v-if="!open"
                                 class="emailExplanationHeader"
                             >
-                                <div>
+                                <div :class="item.headerClasses">
                                     {{ getExplanation(item) }}
                                 </div>
                             </v-col>
@@ -89,7 +96,15 @@
                 </template>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-                <div class="d-flex flex-row">
+                <div class="d-flex flex-row" v-if="item.contentFrom">
+                    <div class="emailContentHeaderLabel">
+                        {{ $locStr('From') }}:
+                    </div>
+                    <div class="emailContentHeader">
+                        {{ item.contentFrom }}:
+                    </div>
+                </div>
+                <div class="d-flex flex-row" v-if="item.contentTo">
                     <div class="emailContentHeaderLabel">
                         {{ $locStr('To') }}:
                     </div>
@@ -111,18 +126,20 @@
 <script>
 import { dataStore } from '../main';
 import { getFormattedDate } from '../plugins/utils';
+import { markHistoryItemUnread } from '../controllers/messages';
 
 export default {
     name: 'MangoFpEmailHistory',
     props: {
-        history: {
-            type: Array,
+        messageId: {
+            type: String,
             required: true,
         },
     },
     data() {
         return {
-            expanded: [],
+            expanded: undefined,
+            history: dataStore.getMessageHistory(this.messageId) || [],
             headers: [
                 { text: this.$locStr('Date'), value: 'dateTime' },
                 { text: this.$locStr('Status'), value: 'changeSubType' },
@@ -156,6 +173,7 @@ export default {
     },
     computed: {
         emailHistory() {
+            console.log('Recalculating history ...');
             return this.history.reduce((accumulator, item) => {
                 if (item.changeType === 'EMAIL_SENT') {
                     const content = JSON.parse(item.content);
@@ -165,8 +183,11 @@ export default {
                         changeType: item.changeType,
                         changeSubType: item.changeSubType,
                         contentTo: content.to,
+                        contentFrom: '',
                         contentMessage: content.message,
                         contentSubject: content.subject,
+                        isUnread: !!item.isUnread,
+                        headerClasses: this.boldWhenNew(item),
                     });
                 } else if (item.changeType === 'EMAIL_RECEIVED') {
                     const content = JSON.parse(item.content);
@@ -179,6 +200,8 @@ export default {
                         contentFrom: content.from,
                         contentMessage: content.message,
                         contentSubject: content.subject,
+                        isUnread: !!item.isUnread,
+                        headerClasses: this.boldWhenNew(item),
                     });
                 }
                 return accumulator;
@@ -221,10 +244,59 @@ export default {
 
             return this.messageTypes['default'];
         },
-        markUnread(item) {
-            console.log('About to mark unread');
+        boldWhenNew(item) {
+            if (item.isUnread) {
+                return 'unreadItem';
+            }
+            return '';
+        },
+        toggleItemPanel(item) {
+            const thePanel = this.$refs['panel' + item.id];
+            if (!thePanel) {
+                throw new Error('Trying to fetch panel that does not exist');
+            }
+            thePanel[0].toggle();
+        },
+        clickOnPanelHeader(item) {
+            console.log('Click on panel header');
+            console.log('Expanded: ');
             console.log(item);
-            //TODO: create action for marking the item as unread
+            //expanded is data that is used for v-model for -expansion-panels.
+            //if it has a value then this is an index of open expansion panel
+            //if no index, then, panels are closed and we are about to open the panel with item
+            //so - lets mark it as read
+            if (this.expanded === undefined && item.isUnread) {
+                this.markRead(item);
+            }
+        },
+        async markRead(item) {
+            let historyItem = this.history.find(el => el.id == item.id);
+            if (!historyItem) {
+                throw new Error(
+                    'Somehow history item is not found for '.item.id,
+                );
+            }
+
+            console.log('Item about to mark read:');
+            markHistoryItemUnread({ ...historyItem, isUnread: false });
+        },
+        async markUnread(item) {
+            let historyItem = this.history.find(el => el.id == item.id);
+            if (!historyItem) {
+                throw new Error(
+                    'Somehow history item is not found for '.item.id,
+                );
+            }
+
+            console.log('Item about to mark unread:');
+            console.log(historyItem);
+            const success = await markHistoryItemUnread({
+                ...historyItem,
+                isUnread: true,
+            });
+            if (success) {
+                this.toggleItemPanel(item);
+            }
         },
     },
 };
@@ -251,6 +323,8 @@ $textarea-padding: 5px
 .historyItemMenuRow
     &:hover
         background-color: #eeeeee
+.unreadItem
+    font-weight: bold
 .emailContentDetails
     div
         border-color: white !important

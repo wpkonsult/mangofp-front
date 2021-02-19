@@ -148,9 +148,7 @@
                             :emailTemplates="emailTemplates"
                             :details="details"
                         />
-                        <MangoFpEmailHistory
-                            :history="details.changeHistory || []"
-                        >
+                        <MangoFpEmailHistory :messageId="selectedItem">
                         </MangoFpEmailHistory>
                     </v-tab-item>
                 </v-tabs>

@@ -64,14 +64,14 @@ async function fetchMessagesData() {
 }
 
 function setMessages(messagesData) {
-    const messages = [];
+    //dataStore.resetMessages();
     messagesData.forEach(element => {
         const createdMessage = __makeMessage(element);
         if (createdMessage) {
-            messages.push(createdMessage);
+            dataStore.addMessage(createdMessage);
         }
     });
-    return messages;
+    return true;
 }
 
 async function sendEmail(payload, bus) {
@@ -193,6 +193,33 @@ async function fetchTemplates() {
     return true;
 }
 
+async function markHistoryItemUnread(historyItem) {
+    const data = {
+        isUnread: historyItem.isUnread,
+    };
+
+    console.log('Marking message: ');
+    console.log(dataStore.findMessage(historyItem.itemId));
+
+    const result = await makePostRequest(
+        '/messages/' + historyItem.itemId + '/history/' + historyItem.id,
+        data,
+    ).catch(error => {
+        throw new Error('Connection error: ' + error.message);
+    });
+
+    console.log(result);
+
+    if (result) {
+        return dataStore.setMessageHistoryItemRead({
+            messageId: historyItem.itemId,
+            historyItemId: historyItem.id,
+            isUnread: historyItem.isUnread,
+        });
+    }
+    return true;
+}
+
 export {
     fetchLabels,
     fetchMessagesData,
@@ -202,4 +229,5 @@ export {
     getMessage,
     sendEmail,
     fetchTemplates,
+    markHistoryItemUnread,
 };

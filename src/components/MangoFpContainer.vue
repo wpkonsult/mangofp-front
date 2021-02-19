@@ -111,7 +111,15 @@ export default {
                 fetchStepsDataToStore(),
             ]);
             if (stepsLoaded) {
-                this.messagesData = setMessages(messagesData);
+                //TODO - check if this change did not brake anything
+                setMessages(messagesData);
+
+                console.log('DataStore:');
+                console.log(dataStore);
+
+                console.log('In object messagesData:');
+                console.log(this.messagesData);
+
                 this.statuses = Object.values(dataStore.getSteps());
                 this.loaded = true;
             }
@@ -318,7 +326,7 @@ export default {
             statuses: [],
             stateData: [],
             labelsData: [],
-            messagesData: [],
+            messagesData: dataStore.messagesData,
         };
     },
 };

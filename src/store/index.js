@@ -3,6 +3,7 @@ export default class DataStore {
         this.steps = false;
         this.emailTemplates = {};
         this.templateLoaded = false;
+        this.messagesData = [];
     }
 
     setTemplate(
@@ -53,5 +54,54 @@ export default class DataStore {
         }
 
         return this;
+    }
+
+    findMessage(messageId) {
+        return this.messagesData.find(m => m.id === messageId);
+    }
+
+    resetMessages() {
+        this.messagesData.splice(0, this.messageData.length);
+        return true;
+    }
+
+    addMessage(messageData) {
+        this.messagesData.push(messageData);
+        return true;
+    }
+
+    getMessageHistory(messageId) {
+        let message = this.findMessage(messageId);
+        if (!message) {
+            return false;
+        }
+        console.log('Getting message data');
+        console.log(message.changeHistory);
+
+        return message.changeHistory;
+    }
+
+    findMessageHistoryItem(messageId, historyItemId) {
+        let message = this.findMessage(messageId);
+        if (!message) {
+            return false;
+        }
+
+        return message.changeHistory.find(h => h.id === historyItemId);
+    }
+
+    setMessageHistoryItemRead(params) {
+        let message = this.findMessageHistoryItem(
+            params.messageId,
+            params.historyItemId,
+        );
+        if (!message) {
+            throw new Error('message not found for history item update');
+        }
+        console.log('Message found:');
+        message.isUnread = params.isUnread;
+        console.log(params);
+        console.log(message);
+        return true;
     }
 }
