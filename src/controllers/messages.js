@@ -63,8 +63,7 @@ async function fetchMessagesData() {
     return data.messages.sort(compareByLastUpdated);
 }
 
-function setMessages(messagesData) {
-    //dataStore.resetMessages();
+function addMessages(messagesData) {
     messagesData.forEach(element => {
         const createdMessage = __makeMessage(element);
         if (createdMessage) {
@@ -198,17 +197,12 @@ async function markHistoryItemUnread(historyItem) {
         isUnread: historyItem.isUnread,
     };
 
-    console.log('Marking message: ');
-    console.log(dataStore.findMessage(historyItem.itemId));
-
     const result = await makePostRequest(
         '/messages/' + historyItem.itemId + '/history/' + historyItem.id,
         data,
     ).catch(error => {
         throw new Error('Connection error: ' + error.message);
     });
-
-    console.log(result);
 
     if (result) {
         return dataStore.setMessageHistoryItemRead({
@@ -223,7 +217,7 @@ async function markHistoryItemUnread(historyItem) {
 export {
     fetchLabels,
     fetchMessagesData,
-    setMessages,
+    addMessages,
     updateMessage,
     fetchStepsDataToStore,
     getMessage,

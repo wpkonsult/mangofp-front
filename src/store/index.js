@@ -75,9 +75,6 @@ export default class DataStore {
         if (!message) {
             return false;
         }
-        console.log('Getting message data');
-        console.log(message.changeHistory);
-
         return message.changeHistory;
     }
 
@@ -98,10 +95,7 @@ export default class DataStore {
         if (!message) {
             throw new Error('message not found for history item update');
         }
-        console.log('Message found:');
         message.isUnread = params.isUnread;
-        console.log(params);
-        console.log(message);
         return true;
     }
 }

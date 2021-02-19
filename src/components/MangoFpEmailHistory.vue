@@ -258,9 +258,6 @@ export default {
             thePanel[0].toggle();
         },
         clickOnPanelHeader(item) {
-            console.log('Click on panel header');
-            console.log('Expanded: ');
-            console.log(item);
             //expanded is data that is used for v-model for -expansion-panels.
             //if it has a value then this is an index of open expansion panel
             //if no index, then, panels are closed and we are about to open the panel with item

@@ -86,7 +86,7 @@ import MangoFpDetailPane from './MangoFpDetailPane';
 import {
     fetchLabels,
     fetchMessagesData,
-    setMessages,
+    addMessages,
     updateMessage,
     fetchStepsDataToStore,
     getMessage,
@@ -111,14 +111,7 @@ export default {
                 fetchStepsDataToStore(),
             ]);
             if (stepsLoaded) {
-                //TODO - check if this change did not brake anything
-                setMessages(messagesData);
-
-                console.log('DataStore:');
-                console.log(dataStore);
-
-                console.log('In object messagesData:');
-                console.log(this.messagesData);
+                addMessages(messagesData);
 
                 this.statuses = Object.values(dataStore.getSteps());
                 this.loaded = true;
