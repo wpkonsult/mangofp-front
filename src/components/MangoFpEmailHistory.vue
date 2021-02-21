@@ -139,7 +139,6 @@ export default {
     data() {
         return {
             expanded: undefined,
-            history: dataStore.getMessageHistory(this.messageId) || [],
             headers: [
                 { text: this.$locStr('Date'), value: 'dateTime' },
                 { text: this.$locStr('Status'), value: 'changeSubType' },
@@ -172,8 +171,11 @@ export default {
         };
     },
     computed: {
+        history() {
+            return dataStore.getMessageHistory(this.messageId) || [];
+        },
+
         emailHistory() {
-            console.log('Recalculating history ...');
             return this.history.reduce((accumulator, item) => {
                 if (item.changeType === 'EMAIL_SENT') {
                     const content = JSON.parse(item.content);
@@ -274,7 +276,6 @@ export default {
                 );
             }
 
-            console.log('Item about to mark read:');
             markHistoryItemUnread({ ...historyItem, isUnread: false });
         },
         async markUnread(item) {
@@ -285,8 +286,6 @@ export default {
                 );
             }
 
-            console.log('Item about to mark unread:');
-            console.log(historyItem);
             const success = await markHistoryItemUnread({
                 ...historyItem,
                 isUnread: true,

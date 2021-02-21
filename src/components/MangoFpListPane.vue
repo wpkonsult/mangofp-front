@@ -15,11 +15,15 @@
                         @click="selectItem(item)"
                         :class="{ selectedLine: selectedItem === item.id }"
                     >
-                        <td>{{ item.label }}</td>
-                        <td>{{ item.email }}</td>
-                        <td>{{ item.name }}</td>
+                        <td :class="getUnreadClass(item)">{{ item.label }}</td>
+                        <td :class="getUnreadClass(item)">
+                            {{ item.email }}
+                        </td>
+                        <td :class="getUnreadClass(item)">{{ item.name }}</td>
                         <td>{{ item.note.substr(0, 100) }}</td>
-                        <td>{{ getFormattedDate(item.lastUpdated) }}</td>
+                        <td :class="getUnreadClass(item)">
+                            {{ getFormattedDate(item.lastUpdated) }}
+                        </td>
                         <td v-if="showDetails">
                             <MangoFpMessageInList
                                 v-bind:content="item.content"
@@ -48,6 +52,9 @@ export default {
         },
         getFormattedDate(dateIsoString) {
             return getFormattedDate(dateIsoString);
+        },
+        getUnreadClass(item) {
+            return item.isUnread ? 'unRead' : '';
         },
     },
     props: {
@@ -123,5 +130,9 @@ export default {
 .selectedLine {
     background-color: #1976d2 !important;
     color: #ffffff;
+}
+
+.unRead {
+    font-weight: bold;
 }
 </style>

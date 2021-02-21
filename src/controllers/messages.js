@@ -29,6 +29,7 @@ function __makeMessage(element) {
             name: element.name,
             note: element.note,
             lastUpdated: element.lastUpdated,
+            isUnread: element.isUnread,
             content: Object.entries(JSON.parse(element.content)),
         };
 
