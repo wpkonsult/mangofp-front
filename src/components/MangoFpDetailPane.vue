@@ -118,7 +118,10 @@
         </v-col>
         <v-col cols="12">
             <v-card>
-                <v-tabs v-if="globalState.templateLoaded">
+                <v-tabs
+                    v-if="globalState.templateLoaded"
+                    :v-model="selectedDetail"
+                >
                     <v-tab>
                         <v-icon left>mdi-history</v-icon>
                         {{ $locStr('Action') }}
@@ -233,6 +236,7 @@ export default {
                 labelId: '',
                 note: '',
                 content: [],
+                selectedDetail: 0
             };
 
             if (!this.selectedItem) {
@@ -249,6 +253,7 @@ export default {
                     note: data.note,
                     changeHistory: data.changeHistory,
                     content: data.content,
+                    selectedDetail: 1,
                 };
             }
 

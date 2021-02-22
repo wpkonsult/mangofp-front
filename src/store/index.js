@@ -1,6 +1,6 @@
 export default class DataStore {
     constructor() {
-        this.steps = false;
+        this.steps = {};
         this.emailTemplates = {};
         this.templateLoaded = false;
         this.messagesData = [];
@@ -21,10 +21,6 @@ export default class DataStore {
     }
 
     setStep(code, stepObj) {
-        if (!this.steps) {
-            this.steps = {};
-        }
-
         if (!('code' in stepObj)) {
             throw new Error('code not found in stepObj');
         }
@@ -36,7 +32,7 @@ export default class DataStore {
             throw new Error('order not found in stepObj');
         }
 
-        this.steps[code] = { ...stepObj };
+        this.steps[code] = { ...stepObj, isUnread: false };
         return this;
     }
 
@@ -108,16 +104,47 @@ export default class DataStore {
 
         if (params.isUnread) {
             message.isUnread = true;
+            this.setStepUnread(message.code, true);
         } else {
             const foundUrenadHItem = message.changeHistory.find(
                 h => h.isUnread,
             );
             if (foundUrenadHItem) {
                 message.isUnread = true;
+                this.setStepUnread(message.code, true);
             } else {
                 message.isUnread = false;
+                this.checkAndSetStepUnreadStatus(message.code);
             }
         }
+        return true;
+    }
+
+    checkAndSetStepUnreadStatus(code) {
+        //If there is at least one unread message, step is unread
+        //otherwise step is read
+        if (!(code in this.steps)) {
+            throw new Error('Could not find step for setting unread');
+        }
+        const foundUnread = this.messagesData.find(
+            msg => msg.code === code && msg.isUnread,
+        );
+        if (foundUnread) {
+            this.setStepUnread(code, true);
+        } else {
+            this.setStepUnread(code, false);
+        }
+
+        return true;
+    }
+
+    setStepUnread(code, isUnread) {
+        if (!(code in this.steps)) {
+            throw new Error('Could not find step for setting unread');
+        }
+
+        this.steps[code].isUnread = isUnread;
+
         return true;
     }
 }

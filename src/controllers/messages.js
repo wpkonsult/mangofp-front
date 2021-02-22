@@ -71,6 +71,11 @@ function addMessages(messagesData) {
             dataStore.addMessage(createdMessage);
         }
     });
+
+    for (const stepCode in dataStore.steps) {
+        dataStore.checkAndSetStepUnreadStatus(stepCode);
+    }
+
     return true;
 }
 

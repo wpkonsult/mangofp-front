@@ -38,9 +38,9 @@
         </v-row>
 
         <v-tabs @change="tabChanged">
-            <v-tab v-for="status in statuses" :key="status.order">{{
-                status.state
-            }}</v-tab>
+            <v-tab v-for="status in statuses" :key="status.order">
+                <div :class="getTabClasses(status)">{{ status.state }}</div>
+            </v-tab>
             <v-tab-item v-for="status in statuses" :key="status.code">
                 <v-row align="stretch">
                     <v-col
@@ -113,8 +113,10 @@ export default {
             if (stepsLoaded) {
                 addMessages(messagesData);
 
-                this.statuses = Object.values(dataStore.getSteps());
+                //this.statuses = Object.values(dataStore.getSteps());
                 this.loaded = true;
+                console.log('All steps loaded');
+                console.log(dataStore)
             }
         } catch (e) {
             this.error = e.message;
@@ -256,8 +258,15 @@ export default {
                 this.labelFilter = [];
             });
         },
+
+        getTabClasses(step) {
+            return step.isUnread ? 'bolder' : '';
+        }
     },
     computed: {
+        statuses() {
+            return Object.values(this.allSteps);
+        },
         appVersion() {
             if (!window.MANGOFP_RESOURCES.version) {
                 return 'NA';
@@ -316,7 +325,7 @@ export default {
             loaded: false,
             labelFilter: [],
             selectedTab: 1,
-            statuses: [],
+            allSteps: dataStore.steps,
             stateData: [],
             labelsData: [],
             messagesData: dataStore.messagesData,
@@ -338,6 +347,15 @@ export default {
 
 .detailPaneContainer {
     background-color: rgb(241, 241, 241);
+}
+
+.bolder {
+    color: black;
+}
+
+.v-tab--active .bolder {
+    color: rgb(25, 118, 210);
+    font-weight: bold;
 }
 
 @media screen and (max-width: 864px) {
