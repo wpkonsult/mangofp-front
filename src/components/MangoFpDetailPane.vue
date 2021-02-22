@@ -120,7 +120,7 @@
             <v-card>
                 <v-tabs
                     v-if="globalState.templateLoaded"
-                    :v-model="selectedDetail"
+                    v-model="selectedDetail"
                 >
                     <v-tab>
                         <v-icon left>mdi-history</v-icon>
@@ -207,6 +207,11 @@ export default {
         closeDetailsPane() {
             this.$emit('CloseDetails');
         },
+
+        getActiveDetailsTab(submitted, selectedItem) {
+            const data = submitted.find(s => s.id === selectedItem);
+            return data && data.isUnread ? 1 : 0;
+        },
     },
     computed: {
         actions() {
@@ -236,7 +241,7 @@ export default {
                 labelId: '',
                 note: '',
                 content: [],
-                selectedDetail: 0
+                isUnread: false,
             };
 
             if (!this.selectedItem) {
@@ -253,7 +258,7 @@ export default {
                     note: data.note,
                     changeHistory: data.changeHistory,
                     content: data.content,
-                    selectedDetail: 1,
+                    isUnread: data.isUnread,
                 };
             }
 
@@ -321,11 +326,24 @@ export default {
             required: true,
         },
     },
+    watch: {
+        selectedItem() {
+            //When message is unread, open message history automaticly. Otherwise open actions pane
+            this.selectedDetail = this.getActiveDetailsTab(
+                this.submitted,
+                this.selectedItem,
+            );
+        },
+    },
     data() {
         return {
             globalState: dataStore,
             contentOpen: [0],
             dataOpen: [],
+            selectedDetail: this.getActiveDetailsTab(
+                this.submitted,
+                this.selectedItem,
+            ),
         };
     },
     async mounted() {

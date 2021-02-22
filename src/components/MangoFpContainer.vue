@@ -112,11 +112,7 @@ export default {
             ]);
             if (stepsLoaded) {
                 addMessages(messagesData);
-
-                //this.statuses = Object.values(dataStore.getSteps());
                 this.loaded = true;
-                console.log('All steps loaded');
-                console.log(dataStore)
             }
         } catch (e) {
             this.error = e.message;
@@ -261,7 +257,7 @@ export default {
 
         getTabClasses(step) {
             return step.isUnread ? 'bolder' : '';
-        }
+        },
     },
     computed: {
         statuses() {
