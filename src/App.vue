@@ -1,8 +1,6 @@
 <template>
     <v-app>
-        <v-content>
-            <MangoFpContainer />
-        </v-content>
+        <MangoFpContainer />
     </v-app>
 </template>
 

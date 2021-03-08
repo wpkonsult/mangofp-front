@@ -1,62 +1,25 @@
 <template>
     <v-container>
-        <v-row>
+        <v-row no-gutters>
             <v-col>
-                <v-card v-if="composingInProgress">
-                    <v-card-title>
-                        Send email
-                    </v-card-title>
-                    <v-divider></v-divider>
-                    <v-card-text style="height: 300px;">
-                        <p><b>Email to: </b>{{ addresses.join(', ') }}</p>
-                        <v-textarea
-                            name="email-text"
-                            no-resize
-                            rows="8"
-                            dense
-                            v-model="emailContent"
-                        ></v-textarea>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn
-                            color="blue darken-1"
-                            outlined
-                            @click.native="send"
-                            :disabled="disabledWhileActionInProgress"
-                        >
-                            {{ $locStr('Send') }}
-                        </v-btn>
-                        <MangoFpAttachment
-                            @attachmentsReceived="addAttachments"
-                            @submittingAttachments="submittingAttachments"
-                            @submittingAttachmentsFinished="
-                                submittingAttachmentsFinished
-                            "
-                        />
-                    </v-card-actions>
-                    <v-chip
-                        class="ma-2"
-                        color="primary"
-                        label
-                        close
-                        v-for="attachment in attachments"
-                        :key="attachment.id"
-                        @click:close="removeAttachment(attachment.id)"
-                        @click="downloadAttachment(attachment.url)"
+                <v-card>
+                    <MangoFpEmailForm
+                        v-if="composingInProgress"
+                        :emailFormName="$locStr('Send email')"
+                        :emailContent="emailContent"
+                        :emailSubject="emailSubject"
+                        :addresses="addresses"
+                        :ccaddresses="ccaddresses"
+                        :contactEmail="details.email"
+                        @sendEmail="send"
+                        @cancelEmail="cancelEmail"
                     >
-                        {{ attachment.file_name }}
-                    </v-chip>
-                </v-card>
-                <v-card v-else>
-                    <v-card-actions>
-                        <v-btn
-                            color="blue darken-1"
-                            outlined
-                            @click.native="createNewEmail"
-                        >
-                            Compose new email
+                    </MangoFpEmailForm>
+                    <div v-else class="pa-5">
+                        <v-btn color="primary" outlined @click="createNewEmail">
+                            {{ $locStr('New email') }}
                         </v-btn>
-                    </v-card-actions>
+                    </div>
                 </v-card>
             </v-col>
         </v-row>
@@ -65,18 +28,18 @@
 
 <script>
 import { bus } from '../main';
-import MangoFpAttachment from './MangoFpAttachment';
+import MangoFpEmailForm from './MangoFpEmailForm';
 export default {
     name: 'MangoFpEmail',
     components: {
-        MangoFpAttachment,
+        MangoFpEmailForm,
     },
     data() {
         return {
             composingInProgress: false,
             emailContent: '',
-            emailSubject: '',
             attachments: [],
+            ccaddresses: [],
             disabledWhileActionInProgress: false,
         };
     },
@@ -84,51 +47,30 @@ export default {
         addresses() {
             return [this.details.email];
         },
+        emailSubject() {
+            return this.details.label || '';
+        },
     },
     methods: {
-        clear() {
-            this.emailContent = 'no content';
-            this.emailSubject = 'dummy';
-        },
-        send() {
+        send(values) {
             bus.$emit('EventSendEmail', {
                 messageId: this.details.id,
-                emailContent: this.emailContent,
-                emailSubject: this.emailSubject,
-                addresses: this.addresses,
-                emailAttachments: this.attachments.map(rec => rec.id),
+                emailContent: values.emailContent,
+                emailSubject: values.emailSubject,
+                addresses: values.addresses,
+                ccAddresses: values.ccAddresses,
+                emailAttachments: values.emailAttachments,
             });
-        },
-        addAttachments(files) {
-            this.attachments = [...this.attachments, ...files];
-            this.disabledWhileActionInProgress = false;
-        },
-        submittingAttachments() {
-            this.disabledWhileActionInProgress = true;
-        },
-        submittingAttachmentsFinished() {
-            this.disabledWhileActionInProgress = false;
-        },
-        removeAttachment(attachmentId) {
-            this.attachments = this.attachments.filter(
-                obj => obj.id !== attachmentId,
-            );
-        },
-        downloadAttachment(attachmentUrl) {
-            let a = document.createElement('a');
-            a.href = attachmentUrl;
-            a.download = attachmentUrl.split('/').pop();
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            this.composingInProgress = false;
         },
         createNewEmail() {
             this.composingInProgress = true;
+            this.emailContent = '';
+            this.attachments = [];
         },
         cancelEmail() {
             this.composingInProgress = false;
             this.emailContent = '';
-            this.emailSubject = '';
             this.attachments = [];
         },
     },
@@ -155,4 +97,6 @@ export default {
     },
 };
 </script>
-<style></style>
+<style>
+@import '../assets/css/mangofp.css';
+</style>

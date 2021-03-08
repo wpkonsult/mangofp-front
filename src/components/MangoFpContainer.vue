@@ -1,36 +1,74 @@
 <template>
     <v-sheet v-if="loaded" class="pa-md-4">
-        <h2>{{ appVersion }}</h2>
-        <v-select
-            :items="labels"
-            v-model="labelFilter"
-            label="Filter"
-            outlined
-        ></v-select>
+        <v-row no-gutters>
+            <v-col cols="6">
+                <h2 class>{{ appVersion }}</h2>
+            </v-col>
+            <v-col>
+                <v-select
+                    class="generalLabelFilter"
+                    :items="labels"
+                    v-model="labelFilter"
+                    label="Filter labels"
+                    dense
+                    multiple
+                    outlined
+                >
+                    <template v-slot:prepend-item>
+                        <v-list-item ripple @click="selectAll">
+                            <v-list-item-action>
+                                <v-icon
+                                    :color="
+                                        labelFilter.length == 0 ? 'primary' : ''
+                                    "
+                                >
+                                    {{ icon }}
+                                </v-icon>
+                            </v-list-item-action>
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    {{ $locStr('No filter') }}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-divider class="mt-2"></v-divider>
+                    </template>
+                </v-select>
+            </v-col>
+        </v-row>
+
         <v-tabs @change="tabChanged">
-            <v-tab v-for="status in statuses" :key="status.order">{{
-                status.state
-            }}</v-tab>
+            <v-tab v-for="status in statuses" :key="status.order">
+                <div :class="getTabClasses(status)">{{ status.state }}</div>
+            </v-tab>
             <v-tab-item v-for="status in statuses" :key="status.code">
-                <h2>{{ status.state }}</h2>
                 <v-row align="stretch">
-                    <v-col :cols="listWidth">
+                    <v-col
+                        :cols="listWidth"
+                        :lg="listWidth < 12 ? listWidth + 2 : 0"
+                    >
                         <MangoFpListPane
                             value="0"
                             :submitted="filtered"
                             :selectedItem="selectedItem"
                             :labelsData="labelsData"
                             @row-selected="rowSelected"
+                            :showDetails="!detailPaneIsOpen"
                         />
                     </v-col>
-                    <v-col v-if="selectedItem" cols="6">
+                    <v-col
+                        v-if="selectedItem"
+                        cols="9"
+                        lg="7"
+                        class="detailPaneContainer"
+                    >
                         <MangoFpDetailPane
                             :selectedItem="selectedItem"
                             :submitted="submitted"
                             :labelsData="labelsData"
                             :selectedTab="selectedTab"
                             :statuses="statuses"
-                            :emailTemplates="emailTemplates"
+                            @CloseDetails="closeSidePane"
                         />
                     </v-col>
                 </v-row>
@@ -47,13 +85,14 @@ import MangoFpListPane from './MangoFpListPane';
 import MangoFpDetailPane from './MangoFpDetailPane';
 import {
     fetchLabels,
-    fetchMessages,
+    fetchMessagesData,
+    addMessages,
     updateMessage,
-    getStates,
+    fetchStepsDataToStore,
     getMessage,
     sendEmail,
 } from './../controllers/messages';
-import { bus } from '../main';
+import { bus, dataStore } from '../main';
 
 export default {
     name: 'MangoFpContainer',
@@ -63,23 +102,29 @@ export default {
     },
     async mounted() {
         this.subscribe();
-        this.statuses = Object.values(this.stateData);
+        let messagesData;
+        let stepsLoaded;
         try {
-            [this.labelsData, this.submittedData] = await Promise.all([
+            [this.labelsData, messagesData, stepsLoaded] = await Promise.all([
                 fetchLabels(),
-                fetchMessages(),
+                fetchMessagesData(),
+                fetchStepsDataToStore(),
             ]);
-            this.loaded = true;
+            if (stepsLoaded) {
+                addMessages(messagesData);
+                this.loaded = true;
+            }
         } catch (e) {
             this.error = e.message;
         }
     },
     methods: {
         openSidePane() {
-            this.listWidth = '6';
+            this.listWidth = 3;
         },
         closeSidePane() {
-            this.listWidth = '12';
+            this.listWidth = 12;
+            this.selectedItem = '';
         },
         rowSelected(item) {
             this.selectedItem = item.id;
@@ -91,7 +136,6 @@ export default {
         },
         tabChanged(tab) {
             this.selectedTab = tab;
-            this.selectedItem = '';
             this.closeSidePane();
         },
         subscribe() {
@@ -120,6 +164,17 @@ export default {
                     bus,
                 );
             });
+            bus.$on('EventNameLabelChanged', payload => {
+                updateMessage(
+                    {
+                        message: {
+                            id: payload.message.id,
+                            name: payload.message.name,
+                        },
+                    },
+                    bus,
+                );
+            });
             bus.$on('EventNoteChanged', payload => {
                 updateMessage(
                     {
@@ -142,7 +197,6 @@ export default {
                     bus,
                 );
                 if (success) {
-                    this.selectedItem = '';
                     this.closeSidePane();
                 }
             });
@@ -153,6 +207,7 @@ export default {
                             id: payload.messageId,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
+                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },
@@ -168,6 +223,7 @@ export default {
                             code: payload.newState,
                             emailContent: payload.emailContent,
                             addresses: payload.addresses,
+                            ccAddresses: payload.ccAddresses,
                             emailSubject: payload.emailSubject,
                             emailAttachments: payload.emailAttachments,
                         },
@@ -183,18 +239,30 @@ export default {
                 this.error = payload.error;
             });
             bus.$on('DataMessageUpdated', message => {
-                const updateIndex = this.submittedData.findIndex(
+                const updateIndex = this.messagesData.findIndex(
                     el => el.id === message.id,
                 );
                 if (updateIndex < 0) {
-                    this.submittedData.push(message);
+                    this.messagesData.push(message);
                 } else {
-                    this.submittedData.splice(updateIndex, 1, message);
+                    this.messagesData.splice(updateIndex, 1, message);
                 }
             });
         },
+        selectAll() {
+            this.$nextTick(() => {
+                this.labelFilter = [];
+            });
+        },
+
+        getTabClasses(step) {
+            return step.isUnread ? 'bolder' : '';
+        },
     },
     computed: {
+        statuses() {
+            return Object.values(this.allSteps);
+        },
         appVersion() {
             if (!window.MANGOFP_RESOURCES.version) {
                 return 'NA';
@@ -213,7 +281,7 @@ export default {
                 labelsObj[elem.id] = elem.name;
             });
 
-            const ret = this.submittedData.map(elem => ({
+            const ret = this.messagesData.map(elem => ({
                 ...elem,
                 label: labelsObj[elem.labelId] || '',
                 changeHistory: elem.changeHistory || false,
@@ -224,10 +292,9 @@ export default {
         filtered() {
             return this.submitted.filter(
                 elem =>
-                    (!this.labelFilter ||
-                        this.labelFilter === '000' ||
-                        elem.labelId === this.labelFilter) &&
-                    elem.code === this.statuses[this.selectedTab].code,
+                    elem.code === this.statuses[this.selectedTab].code &&
+                    (this.labelFilter.length == 0 ||
+                        this.labelFilter.includes(elem.labelId)),
             );
         },
         labels() {
@@ -235,13 +302,16 @@ export default {
                 value: item.id,
                 text: item.name,
             }));
-
-            labels.unshift({
-                value: '000',
-                text: '--- ' + this.$locStr('All') + ' ---',
-            });
-
             return labels;
+        },
+        detailPaneIsOpen() {
+            return this.listWidth != 12;
+        },
+        icon() {
+            if (this.labelFilter.length == 0) {
+                return 'mdi-checkbox-marked';
+            }
+            return 'mdi-checkbox-blank-outline';
         },
     },
     data() {
@@ -249,49 +319,12 @@ export default {
             selectedItem: '',
             listWidth: '12',
             loaded: false,
-            labelFilter: '000',
+            labelFilter: [],
             selectedTab: 1,
-            statuses: [],
-            stateData: getStates(),
+            allSteps: dataStore.steps,
+            stateData: [],
             labelsData: [],
-            submittedData: [],
-            emailTemplates: {
-                REGISTERED: {
-                    addresses: ['wp@nort.ee'],
-                    template:
-                        'Tere!\n\nSuur tänu! Olete koolitusele registreeritud.\nTäpsema info ja arve saadame enne koolituse algust e-mailile.\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
-                },
-                WAIT4CONF: {
-                    addresses: ['wp@nort.ee'],
-                    template:
-                        'Tere!\n\nSuur tänu! Olete koolitusele registreeritud.\n\nSaadan Töötukassasse ära registreerimisteate ja annan teada kui neilt kinnitus saabub.\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
-                },
-                CONFRECEIVED: {
-                    addresses: ['wp@nort.ee'],
-                    template:
-                        'Tere!\n\nTöötukassalt saabus kinnitus, sellega on nüüd kõik korras ja jääb ainult koolitust oodata.\n\nSaadan enne koolituse algust veel täpsustava infomeili.\n\nTervitades\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
-                },
-                WAIT4ACCEPT: {
-                    addresses: ['wp@nort.ee'],
-                    template:
-                        'Tere!\n\nSuur tänu, et tunnete huvi meie koolituse vastu. Kuna järgmine koolitusaeg ei ole hetkel veel paigas, siis jätame Teid ootelehele ja anname teada kui koolitusaeg selgub.\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
-                },
-                WAIT4NEW: {
-                    addresses: ['wp@nort.ee'],
-                    template:
-                        'Tere!\n\nSuur tänu, et tunnete huvi meie koolituse vastu. Kuna järgmine koolitusaeg ei ole hetkel veel paigas, siis jätame Teid ootelehele ja anname teada kui koolitusaeg selgub.\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
-                },
-                NOTIFIED: {
-                    addresses: ['wp@nort.ee'],
-                    template:
-                        'Tere!\n\nOotame Teid esmaspäeval, 06. novembril kell 10.00, Exceli täiendkoolituse esimesele päevale.\n\nKoolitus toimub NORT Koolituse arvutiklassis, Vaksali 17a, ruum 407, Tartu (sissepääs Vaksali tänavalt, lillepoe ja kohvikuga samast uksest, liftiga 4.korrusele, asume otse lifti vastas.)\n\nPanin kaasa ka koolitusarve. Kui midagi oleks selles vaja muuta, siis andke palun teada.\n\nParkimine -  tänava ääres kellaga 90 min tasuta ja alates kella 18.00-st tasuta. Raudtee äärses parklas ja Tiigi tn äärses parklas on kogu aeg tasuta. Lähim linnaliini peatus on „Vaksali“.\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
-                },
-                NEWSLETTER: {
-                    addresses: ['wp@nort.ee'],
-                    template:
-                        'Tere!\n\nAitäh, et liitusite meie uudiskirjaga!.\n\nTänutäheks pakume Teile koolitusel osalemiseks soodustust -10%. (Soodustuse saamiseks, kirjutage koolitusele registreerumisel lisainfo lahtrisse sõna - "uudiskiri") Meie koolituskalendri leiate aadressilt https://nort.ee/koolituskalender/ \n\nKui on küsimusi, siis vastan meeleldi.\n\nTervitustega\nSirli Järviste\n_______________\nN.O.R.T Koolitus\nVaksali 17a, (407), Tartu\nhttps://www.nort.ee\ninfo@nort.ee\ntel. 7428000',
-                },
-            },
+            messagesData: dataStore.messagesData,
         };
     },
 };
@@ -302,5 +335,28 @@ export default {
 }
 .v-select.v-text-field input {
     display: none;
+}
+
+.generalLabelFilter .v-text-field__details {
+    display: none;
+}
+
+.detailPaneContainer {
+    background-color: rgb(241, 241, 241);
+}
+
+.bolder {
+    color: black;
+}
+
+.v-tab--active .bolder {
+    color: rgb(25, 118, 210);
+    font-weight: bold;
+}
+
+@media screen and (max-width: 864px) {
+    .v-menu__content {
+        margin-left: -55px;
+    }
 }
 </style>

@@ -1,44 +1,8 @@
-/*globals MANGOFP_RESOURCES:false */
-import axios from 'axios';
-
-const ROOT_URL = MANGOFP_RESOURCES['adminUrl'];
-
-async function __makeGetRequest(endpoint) {
-    const res = await axios.get(ROOT_URL + endpoint);
-    if (!res || res.status !== 200) {
-        throw new Error('Unable to read data from ' + endpoint);
-    }
-
-    if (
-        !('status' in res.data) ||
-        res.data.status !== 'RESULT_SUCCESS' ||
-        !('payload' in res.data)
-    ) {
-        throw new Error('Could not read response status');
-    }
-
-    return res.data.payload;
-}
-
-async function __makePostRequest(endpoint, payload) {
-    const res = await axios.post(ROOT_URL + endpoint, payload);
-    if (!res || res.status !== 200) {
-        throw new Error('Error received from request. Details: ' + endpoint);
-    }
-
-    if (
-        !('status' in res.data) ||
-        res.data.status !== 'RESULT_SUCCESS' ||
-        !('payload' in res.data)
-    ) {
-        throw new Error('Could not read response status');
-    }
-
-    return res.data.payload;
-}
+import { dataStore } from '../main';
+import { makeGetRequest, makePostRequest } from './common';
 
 async function fetchLabels() {
-    const data = await __makeGetRequest('/labels');
+    const data = await makeGetRequest('/labels');
 
     if (!('labels' in data) || !Array.isArray(data.labels)) {
         throw new Error('No labels found in response');
@@ -54,7 +18,7 @@ async function fetchLabels() {
 
 function __makeMessage(element) {
     try {
-        const states = getStates();
+        const states = dataStore.getSteps();
         const data = {
             id: element.id,
             form: element.form,
@@ -65,6 +29,7 @@ function __makeMessage(element) {
             name: element.name,
             note: element.note,
             lastUpdated: element.lastUpdated,
+            isUnread: element.isUnread,
             content: Object.entries(JSON.parse(element.content)),
         };
 
@@ -77,20 +42,41 @@ function __makeMessage(element) {
     }
 }
 
-async function fetchMessages() {
-    const data = await __makeGetRequest('/messages');
+async function fetchMessagesData() {
+    const data = await makeGetRequest('/messages');
 
     if (!('messages' in data) || !Array.isArray(data.messages)) {
         throw new Error('No messages found in response');
     }
-    const messages = [];
-    data.messages.forEach(element => {
+
+    function compareByLastUpdated(a, b) {
+        const aLastUpdated = a.lastUpdated;
+        const bLastUpdated = b.lastUpdated;
+        if (aLastUpdated < bLastUpdated) {
+            return 1;
+        }
+        if (aLastUpdated > bLastUpdated) {
+            return -1;
+        }
+        return 0;
+    }
+
+    return data.messages.sort(compareByLastUpdated);
+}
+
+function addMessages(messagesData) {
+    messagesData.forEach(element => {
         const createdMessage = __makeMessage(element);
         if (createdMessage) {
-            messages.push(createdMessage);
+            dataStore.addMessage(createdMessage);
         }
     });
-    return messages;
+
+    for (const stepCode in dataStore.steps) {
+        dataStore.checkAndSetStepUnreadStatus(stepCode);
+    }
+
+    return true;
 }
 
 async function sendEmail(payload, bus) {
@@ -102,12 +88,13 @@ async function sendEmail(payload, bus) {
         email: {
             content: payload.message.emailContent,
             addresses: payload.message.addresses,
+            ccAddresses: payload.message.ccAddresses,
             subject: payload.message.emailSubject || '',
             attachments: payload.message.emailAttachments,
         },
     };
 
-    const result = await __makePostRequest(
+    const result = await makePostRequest(
         '/messages/' + data.id + '/emails',
         data,
     ).catch(error => {
@@ -131,6 +118,7 @@ async function updateMessage(payload, bus) {
             code: payload.message.code,
             email: payload.message.email,
             labelId: payload.message.labelId,
+            name: payload.message.name,
             note: payload.message.note,
         },
         email: false,
@@ -139,12 +127,13 @@ async function updateMessage(payload, bus) {
         data.email = {
             content: payload.message.emailContent,
             addresses: payload.message.addresses,
+            ccAddresses: payload.message.ccAddresses || [],
             subject: payload.message.emailSubject || '',
             attachments: payload.message.emailAttachments,
         };
     }
 
-    const result = await __makePostRequest('/messages/' + data.id, data).catch(
+    const result = await makePostRequest('/messages/' + data.id, data).catch(
         error => {
             bus.$emit('ErrorConnection', {
                 error: error.message || 'Unidentified connection error',
@@ -164,7 +153,7 @@ async function getMessage(id, bus) {
         bus.emit('ErrorConnection', { error: 'no id for get request' });
     }
 
-    const result = await __makeGetRequest('/messages/' + id).catch(error => {
+    const result = await makeGetRequest('/messages/' + id).catch(error => {
         bus.$emit('ErrorConnection', {
             error: error.message || 'Unidentified connection error',
         });
@@ -177,101 +166,68 @@ async function getMessage(id, bus) {
     return result;
 }
 
-function getStates() {
-    return {
-        NEW: {
-            order: 1,
-            code: 'NEW',
-            state: 'Uus',
-            action: 'Määra uueks',
-            next: [
-                'REGISTERED',
-                'WAIT4CONF',
-                'WAIT4NEW',
-                'WAIT4ACCEPT',
-                'CANCELLED',
-                'NEWSLETTER',
-                'ARCHIVED',
-            ],
-        },
-        REGISTERED: {
-            order: 2,
-            code: 'REGISTERED',
-            state: 'Registreeritud',
-            action: 'Registreeri',
-            next: ['NOTIFIED', 'ARCHIVED', 'CANCELLED'],
-        },
-        WAIT4CONF: {
-            order: 3,
-            code: 'WAIT4CONF',
-            state: 'TTA kaudu',
-            action: 'TTA kaudu',
-            next: ['CONFRECEIVED', 'CANCELLED'],
-        },
-        CONFRECEIVED: {
-            order: 4,
-            code: 'CONFRECEIVED',
-            state: 'TTA kinnitanud',
-            action: 'TTA kinnitanud',
-            next: ['REGISTERED', 'NOTIFIED', 'CANCELLED'],
-        },
-        WAIT4NEW: {
-            order: 5,
-            code: 'WAIT4NEW',
-            state: 'Ooteleht',
-            action: 'Ooteleht',
-            next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
-        },
-        WAIT4ACCEPT: {
-            order: 6,
-            code: 'WAIT4ACCEPT',
-            state: 'Aeg pakutud',
-            action: 'Paku uus aeg',
-            next: ['REGISTERED', 'WAIT4ACCEPT', 'CANCELLED'],
-        },
-        NOTIFIED: {
-            order: 7,
-            code: 'NOTIFIED',
-            state: 'Teade saadetud',
-            action: 'Saada meeldetuletus',
-            next: ['FBASKED', 'ARCHIVED'],
-        },
-        FBASKED: {
-            order: 8,
-            code: 'FBASKED',
-            state: 'Tagasiside küsitud',
-            action: 'Küsi tagasiside',
-            next: ['ARCHIVED'],
-        },
-        NEWSLETTER: {
-            order: 9,
-            code: 'NEWSLETTER',
-            state: 'Uudiskiri',
-            action: 'Uudiskiri',
-            next: ['ARCHIVED'],
-        },
-        ARCHIVED: {
-            order: 10,
-            code: 'ARCHIVED',
-            state: 'Arhiveeritud',
-            action: 'Arhiveeri',
-            next: [],
-        },
-        CANCELLED: {
-            order: 11,
-            code: 'CANCELLED',
-            state: 'Katkestatud',
-            action: 'Katkesta',
-            next: ['ARCHIVED'],
-        },
+async function fetchStepsDataToStore() {
+    const stepsData = await makeGetRequest('/steps');
+    if (!('steps' in stepsData)) {
+        throw new Error('No steps found in response');
+    }
+
+    dataStore.resetSteps();
+    for (const [key, step] of Object.entries(stepsData.steps)) {
+        dataStore.setStep(key, step);
+    }
+
+    return true;
+}
+
+async function fetchTemplates() {
+    const templatesData = await makeGetRequest('/templates');
+    if (templatesData && 'templates' in templatesData) {
+        for (const code in templatesData.templates) {
+            const data = templatesData.templates[code];
+            if (data && 'template' in data) {
+                dataStore.setTemplate(code, {
+                    addresses: data.mainAddresses,
+                    ccAddresses: data.addresses,
+                    template: data.template,
+                });
+            }
+        }
+    }
+    dataStore.setTemplatesLoaded(true);
+    return true;
+}
+
+async function markHistoryItemUnread(historyItem) {
+    const data = {
+        isUnread: historyItem.isUnread,
     };
+
+    const result = await makePostRequest(
+        '/messages/' + historyItem.itemId + '/history/' + historyItem.id,
+        data,
+    ).catch(error => {
+        throw new Error('Connection error: ' + error.message);
+    });
+
+    if (result) {
+        return dataStore.setMessageHistoryItemRead({
+            messageId: historyItem.itemId,
+            historyItemId: historyItem.id,
+            isUnread: historyItem.isUnread,
+        });
+    }
+    return true;
 }
 
 export {
     fetchLabels,
-    fetchMessages,
+    fetchMessagesData,
+    addMessages,
     updateMessage,
-    getStates,
+    fetchStepsDataToStore,
     getMessage,
     sendEmail,
+    fetchTemplates,
+    markHistoryItemUnread,
 };
