@@ -30,6 +30,3 @@ echo 'Staging '
 echo 'Staging backend'
 ../mangofp/generate_autoload.sh
 ../mangofp/stage_backend.sh
-echo 'Syncing to the staging server ...'
-rsync -Pav --delete -e "ssh -i $HOME/.ssh/zone_rsa" ../mangofp/stage/ virt55795@wpkonsult.ee:/data02/virt55795/domeenid/www.wpkonsult.ee/arendus/wp-content/plugins/mangofp/
-echo 'All done!'
