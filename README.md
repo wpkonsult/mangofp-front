@@ -1,4 +1,5 @@
-# mangofp-front
+# mangofp-front Messaging front - end of MangoFP
+For full project setup see readme of mangofp project
 
 ## Project setup
 ```
@@ -24,6 +25,3 @@ npm run test:unit
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
