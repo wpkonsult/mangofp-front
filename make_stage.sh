@@ -28,5 +28,8 @@ cp -v ../mangofp-settings-ts/dist/css/chunk-vendors.*.css ../mangofp/stage/asset
 cp -v ../mangofp-settings-ts/dist/css/app.*.css ../mangofp/stage/assets/settings/css/app.css
 echo 'Staging '
 echo 'Staging backend'
-../mangofp/generate_autoload.sh
-../mangofp/stage_backend.sh
+cd ../mangofp
+./generate_autoload.sh
+./stage_backend.sh
+
+cd $CURRENTDIR
