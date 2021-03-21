@@ -1,84 +1,88 @@
 <template>
-    <v-sheet v-if="loaded" class="pa-md-0">
-        <v-row no-gutters>
-            <v-col cols="12" id="messages-heading">
-                <h1 class>{{ $locStr('MangoFP messages') }}</h1>
-            </v-col>
-            <v-col md="6" d-none d-md-block> </v-col>
-            <v-col cols="12" md="6" class="pa-1">
-                <v-select
-                    class="generalLabelFilter ma-1"
-                    :items="labels"
-                    v-model="labelFilter"
-                    label="Filter labels"
-                    dense
-                    multiple
-                    outlined
-                >
-                    <template v-slot:prepend-item>
-                        <v-list-item ripple @click="selectAll">
-                            <v-list-item-action>
-                                <v-icon
-                                    :color="
-                                        labelFilter.length == 0 ? 'primary' : ''
-                                    "
-                                >
-                                    {{ icon }}
-                                </v-icon>
-                            </v-list-item-action>
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                    {{ $locStr('No filter') }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-divider class="mt-2"></v-divider>
-                    </template>
-                </v-select>
-            </v-col>
-        </v-row>
-
-        <v-tabs @change="tabChanged">
-            <v-tab v-for="status in statuses" :key="status.order">
-                <div :class="getTabClasses(status)">{{ status.state }}</div>
-            </v-tab>
-            <v-tab-item v-for="status in statuses" :key="status.code">
-                <v-row align="stretch">
-                    <v-col
-                        :cols="listWidth"
-                        :lg="listWidth < 12 ? listWidth + 2 : 0"
+    <div class="messages-container">
+        <v-sheet v-if="loaded" class="pa-md-0">
+            <v-row no-gutters>
+                <v-col cols="12" id="messages-heading">
+                    <h1 class>{{ $locStr('MangoFP messages') }}</h1>
+                </v-col>
+                <v-col md="6" d-none d-md-block> </v-col>
+                <v-col cols="12" md="6" class="pa-1">
+                    <v-select
+                        class="generalLabelFilter ma-1"
+                        :items="labels"
+                        v-model="labelFilter"
+                        label="Filter labels"
+                        dense
+                        multiple
+                        outlined
                     >
-                        <MangoFpListPane
-                            value="0"
-                            :submitted="filtered"
-                            :selectedItem="selectedItem"
-                            :labelsData="labelsData"
-                            @row-selected="rowSelected"
-                            :showDetails="!detailPaneIsOpen"
-                        />
-                    </v-col>
-                    <v-col
-                        v-if="selectedItem"
-                        cols="9"
-                        lg="7"
-                        class="detailPaneContainer"
-                    >
-                        <MangoFpDetailPane
-                            :selectedItem="selectedItem"
-                            :submitted="submitted"
-                            :labelsData="labelsData"
-                            :selectedTab="selectedTab"
-                            :statuses="statuses"
-                            @CloseDetails="closeSidePane"
-                        />
-                    </v-col>
-                </v-row>
-            </v-tab-item>
-        </v-tabs>
-    </v-sheet>
-    <v-sheet v-else class="pa-md-4">
-        <p>Loading ...</p>
-    </v-sheet>
+                        <template v-slot:prepend-item>
+                            <v-list-item ripple @click="selectAll">
+                                <v-list-item-action>
+                                    <v-icon
+                                        :color="
+                                            labelFilter.length == 0
+                                                ? 'primary'
+                                                : ''
+                                        "
+                                    >
+                                        {{ icon }}
+                                    </v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ $locStr('No filter') }}
+                                    </v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-divider class="mt-2"></v-divider>
+                        </template>
+                    </v-select>
+                </v-col>
+            </v-row>
+            <v-tabs @change="tabChanged">
+                <v-tab v-for="status in statuses" :key="status.order">
+                    <div :class="getTabClasses(status)">{{ status.state }}</div>
+                </v-tab>
+                <v-tab-item v-for="status in statuses" :key="status.code">
+                    <v-row align="stretch">
+                        <v-col
+                            :cols="listWidth"
+                            :lg="listWidth < 12 ? listWidth + 2 : 0"
+                        >
+                            <MangoFpListPane
+                                value="0"
+                                :submitted="filtered"
+                                :selectedItem="selectedItem"
+                                :labelsData="labelsData"
+                                @row-selected="rowSelected"
+                                :showDetails="!detailPaneIsOpen"
+                            />
+                        </v-col>
+                        <v-col
+                            v-if="selectedItem"
+                            cols="9"
+                            lg="7"
+                            class="detailPaneContainer"
+                        >
+                            <MangoFpDetailPane
+                                :selectedItem="selectedItem"
+                                :submitted="submitted"
+                                :labelsData="labelsData"
+                                :selectedTab="selectedTab"
+                                :statuses="statuses"
+                                @CloseDetails="closeSidePane"
+                            />
+                        </v-col>
+                    </v-row>
+                </v-tab-item>
+            </v-tabs>
+        </v-sheet>
+        <v-sheet v-else class="pa-md-4">
+            <p>Loading ...</p>
+        </v-sheet>
+        <div class="version-in-footer">Version: {{ appVersion }}</div>
+    </div>
 </template>
 
 <script>
@@ -331,9 +335,32 @@ export default {
 };
 </script>
 <style>
+.messages-container {
+    width: 100%;
+    height: 100%;
+}
+.messages-container .v-sheet {
+    min-height: 100%;
+    padding-bottom: 20px;
+}
 #messages-heading {
     background-color: rgb(241, 241, 241);
 }
+
+#messages-heading h1 {
+    font-size: 23px;
+    font-weight: 400;
+}
+
+.version-in-footer {
+    text-align: right;
+    width: 100%;
+    padding-right: 20px;
+    color: #e1e1e5;
+    font-size: 12px;
+    margin-top: -20px;
+}
+
 .v-menu__content {
     margin-left: -175px;
 }
