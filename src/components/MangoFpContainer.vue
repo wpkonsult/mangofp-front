@@ -1,12 +1,13 @@
 <template>
-    <v-sheet v-if="loaded" class="pa-md-4">
+    <v-sheet v-if="loaded" class="pa-md-0">
         <v-row no-gutters>
-            <v-col cols="6">
-                <h2 class>{{ appVersion }}</h2>
+            <v-col cols="12" id="messages-heading">
+                <h1 class>{{ $locStr('MangoFP messages') }}</h1>
             </v-col>
-            <v-col>
+            <v-col md="6" d-none d-md-block> </v-col>
+            <v-col cols="12" md="6" class="pa-1">
                 <v-select
-                    class="generalLabelFilter"
+                    class="generalLabelFilter ma-1"
                     :items="labels"
                     v-model="labelFilter"
                     label="Filter labels"
@@ -273,7 +274,7 @@ export default {
             )) {
                 version.push(key + ' - ' + value);
             }
-            return 'MangoFp version: ' + version.join(', ') || 'older';
+            return version.join(', ') || 'n/a';
         },
         submitted() {
             const labelsObj = {};
@@ -330,6 +331,9 @@ export default {
 };
 </script>
 <style>
+#messages-heading {
+    background-color: rgb(241, 241, 241);
+}
 .v-menu__content {
     margin-left: -175px;
 }
